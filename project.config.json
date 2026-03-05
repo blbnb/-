@@ -1,0 +1,68 @@
+{
+  "description": "校园二手图书交易平台",
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "setting": {
+    "urlCheck": true,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "preloadBackgroundData": false,
+    "minified": true,
+    "newFeature": true,
+    "coverView": true,
+    "nodeModules": false,
+    "autoAudits": false,
+    "showShadowRootInWxmlPanel": true,
+    "uglifyFileName": true,
+    "showES6CompileOption": false,
+    "useCompilerPlugins": [],
+    "generateVendorSourceMap": false,
+    "autoBuildNativeDep": true,
+    "enableEngineNative": false,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "minifyWXSS": true,
+    "useIsolateContext": false,
+    "useMultiFrameRuntime": true,
+    "useApiHook": true,
+    "useApiHostProcess": true,
+    "compileWorklet": false,
+    "uploadWithSourceMap": true,
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "condition": false,
+    "swc": false,
+    "disableSWC": true,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "compileType": "miniprogram",
+  "libVersion": "2.19.4",
+  "appid": "wx9e6a59f13b7072d2",
+  "projectname": "campus-bookstore",
+  "isGameTourist": false,
+  "simulatorType": "wechat",
+  "simulatorPluginLibVersion": {},
+  "condition": {
+    "search": {
+      "list": []
+    },
+    "conversation": {
+      "list": []
+    },
+    "game": {
+      "list": []
+    },
+    "miniprogram": {
+      "list": []
+    }
+  },
+  "editorSetting": {}
+}
