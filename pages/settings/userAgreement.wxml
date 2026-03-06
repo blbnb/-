@@ -1,0 +1,32 @@
+<!-- pages/settings/userAgreement.wxml -->
+<view class="page">
+  <view class="header">
+    <view class="header-left" bindtap="goBack">
+      <text class="back-icon">‹</text>
+    </view>
+    <view class="header-title">用户协议</view>
+    <view class="header-right empty"></view>
+  </view>
+
+  <scroll-view class="content" scroll-y="true">
+    <view class="agreement-container">
+      <view class="agreement-header">
+        <text class="agreement-title">用户服务协议</text>
+        <text class="agreement-subtitle">（请仔细阅读以下内容）</text>
+      </view>
+
+      <view class="agreement-content">
+        <block wx:for="{{agreementContent}}" wx:key="index">
+          <view class="section-item">
+            <text class="section-title">{{item.title}}</text>
+            <text class="section-content">{{item.content}}</text>
+          </view>
+        </block>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="footer">
+    <text class="footer-text">© 2024 书香科技有限公司 版权所有</text>
+  </view>
+</view>

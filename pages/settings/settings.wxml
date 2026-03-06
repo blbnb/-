@@ -1,0 +1,107 @@
+<!-- pages/settings/settings.wxml -->
+<view class="page">
+  <view class="header">
+    <view class="header-left empty"></view>
+    <view class="header-title">设置</view>
+    <view class="header-right"></view>
+  </view>
+
+  <!-- 账号与安全 -->
+  <view class="settings-section">
+    <view class="section-title">账号与安全</view>
+    <view class="setting-item" bindtap="goToAccountSecurity">
+      <view class="setting-left">
+        <text class="setting-icon">🔒</text>
+        <text class="setting-text">账号与安全</text>
+      </view>
+      <view class="setting-right">
+        <text class="setting-arrow">›</text>
+      </view>
+    </view>
+    <view class="setting-item" bindtap="goToPrivacySettings">
+      <view class="setting-left">
+        <text class="setting-icon">🛡️</text>
+        <text class="setting-text">隐私设置</text>
+      </view>
+      <view class="setting-right">
+        <text class="setting-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 消息设置 -->
+  <view class="settings-section">
+    <view class="section-title">消息设置</view>
+    <view class="setting-item" bindtap="goToNotificationSettings">
+      <view class="setting-left">
+        <text class="setting-icon">🔔</text>
+        <text class="setting-text">消息通知设置</text>
+      </view>
+      <view class="setting-right">
+        <text class="setting-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 通用设置 -->
+  <view class="settings-section">
+    <view class="section-title">通用设置</view>
+    <view class="setting-item" bindtap="clearCache">
+      <view class="setting-left">
+        <text class="setting-icon">🗑️</text>
+        <text class="setting-text">清除缓存</text>
+      </view>
+      <view class="setting-right">
+        <text class="setting-value">{{cacheSize}}</text>
+        <text class="setting-arrow">›</text>
+      </view>
+    </view>
+    <view class="setting-item" bindtap="checkUpdate">
+      <view class="setting-left">
+        <text class="setting-icon">📱</text>
+        <text class="setting-text">检查更新</text>
+      </view>
+      <view class="setting-right">
+        <text class="setting-value">v{{appVersion}}</text>
+        <text class="setting-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 关于 -->
+  <view class="settings-section">
+    <view class="section-title">关于</view>
+    <view class="setting-item" bindtap="goToAbout">
+      <view class="setting-left">
+        <text class="setting-icon">ℹ️</text>
+        <text class="setting-text">关于我们</text>
+      </view>
+      <view class="setting-right">
+        <text class="setting-arrow">›</text>
+      </view>
+    </view>
+    <view class="setting-item" bindtap="goToUserAgreement">
+      <view class="setting-left">
+        <text class="setting-icon">📄</text>
+        <text class="setting-text">用户协议</text>
+      </view>
+      <view class="setting-right">
+        <text class="setting-arrow">›</text>
+      </view>
+    </view>
+    <view class="setting-item" bindtap="goToPrivacyPolicy">
+      <view class="setting-left">
+        <text class="setting-icon">📋</text>
+        <text class="setting-text">隐私政策</text>
+      </view>
+      <view class="setting-right">
+        <text class="setting-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 版本信息 -->
+  <view class="version-info">
+    <text>图书馆商城 v{{appVersion}}</text>
+  </view>
+</view>

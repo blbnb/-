@@ -1,0 +1,67 @@
+<!-- pages/notifications/notifications.wxml -->
+<view class="container">
+  <!-- 页面头部 -->
+  <view class="header">
+    <view class="empty"></view>
+    <view class="title">消息通知</view>
+    <view class="clear-btn" bindtap="clearAllNotifications">
+      <text class="clear-text">清空</text>
+    </view>
+  </view>
+
+  <!-- 标签切换 --</view>
+  <view class="tabs">
+    <view wx:for="{{tabs}}" wx:key="key"
+          class="tab-item {{currentTab === item.key ? 'active' : ''}}"
+          data-tab="{{item.key}}"
+          bindtap="switchTab">
+      <text>{{item.label}}</text>
+    </view>
+  </view>
+
+  <!-- 通知列表 -->
+  <view class="notification-list">
+    <block wx:if="{{!loading && !emptyState}}">
+      <view wx:for="{{notifications}}" wx:key="id"
+            class="notification-item {{item.isRead ? 'read' : ''}}"
+            data-notification="{{item}}"
+            data-id="{{item.id}}"
+            bindtap="onNotificationClick">
+        <!-- 未读标记 -->
+        <view wx:if="{{!item.isRead}}" class="unread-dot"></view>
+        <view class="notification-content">
+          <view class="notification-header">
+            <text class="notification-title">{{item.title}}</text>
+            <text class="notification-time">{{formatTime(item.createTime)}}</text>
+          </view>
+          <text class="notification-body">{{item.content}}</text>
+          <!-- 通知类型标签 -->
+          <view class="notification-type">
+            <text class="type-tag {{item.type}}">
+              {{item.type === 'system' ? '系统通知' : 
+                item.type === 'order' ? '订单消息' : '活动消息'}}
+            </text>
+          </view>
+        </view>
+        <view class="delete-btn" data-id="{{item.id}}" catchtap="deleteNotification">
+          <text class="delete-icon">×</text>
+        </view>
+      </view>
+    </block>
+
+    <!-- 加载中状态 -->
+    <block wx:if="{{loading}}">
+      <view class="loading">
+        <text>加载中...</text>
+      </view>
+    </block>
+
+    <!-- 空状态 -->
+    <block wx:if="{{!loading && emptyState}}">
+      <view class="empty-state">
+        <image src="../../assets/images/empty-notification.svg" mode="aspectFit"></image>
+        <text class="empty-text">暂无通知</text>
+      </view>
+    </block>
+  </view>
+</view>

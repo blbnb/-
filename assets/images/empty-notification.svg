@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+  <!-- 通知图标背景 -->
+  <rect x="8" y="8" width="48" height="48" rx="8" fill="#F2F2F7" stroke="#E5E5EA" stroke-width="2"/>
+  
+  <!-- 铃铛图标 -->
+  <path d="M32 20C35.3137 20 38 22.6863 38 26V32C38 34.2091 39.7909 36 42 36H44V38C44 39.1046 43.1046 40 42 40H22C20.8954 40 20 39.1046 20 38V36H22C24.2091 36 26 34.2091 26 32V26C26 22.6863 28.6863 20 32 20Z" fill="#8E8E93"/>
+  <path d="M28 40V42C28 44.2091 26.2091 46 24 46H40C37.7909 46 36 44.2091 36 42V40" stroke="#8E8E93" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- 斜线表示空状态 -->
+  <line x1="16" y1="48" x2="48" y2="16" stroke="#C7C7CC" stroke-width="2" stroke-linecap="round"/>
+</svg>

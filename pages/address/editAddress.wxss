@@ -1,0 +1,163 @@
+/* pages/address/editAddress.wxss */
+.page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100rpx;
+  background-color: #fff;
+  padding: 0 30rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.header-left {
+  width: 60rpx;
+}
+
+.back-icon {
+  font-size: 40rpx;
+  color: #333;
+}
+
+.header-title {
+  font-size: 36rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.header-right {
+  width: 60rpx;
+  text-align: right;
+}
+
+.save-btn {
+  font-size: 32rpx;
+  color: #07c160;
+  font-weight: 500;
+}
+
+.form-container {
+  background-color: #fff;
+  margin-top: 120rpx;
+  padding-bottom: 30rpx;
+}
+
+.form-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.form-label {
+  width: 160rpx;
+  font-size: 32rpx;
+  color: #333;
+  padding-top: 6rpx;
+}
+
+.form-input {
+  flex: 1;
+  font-size: 32rpx;
+  color: #333;
+  padding: 0;
+}
+
+.form-input::placeholder {
+  color: #999;
+  font-size: 30rpx;
+}
+
+.form-picker {
+  flex: 1;
+}
+
+.picker-view {
+  font-size: 32rpx;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.picker-view .placeholder {
+  color: #999;
+  font-size: 30rpx;
+}
+
+.picker-arrow {
+  font-size: 28rpx;
+  color: #999;
+}
+
+.form-textarea {
+  flex: 1;
+  font-size: 32rpx;
+  color: #333;
+  line-height: 48rpx;
+  padding: 0;
+  min-height: 120rpx;
+  max-height: 200rpx;
+}
+
+.form-textarea::placeholder {
+  color: #999;
+  font-size: 30rpx;
+}
+
+.default-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx;
+  background-color: #fff;
+  margin-top: 20rpx;
+}
+
+.default-text {
+  font-size: 32rpx;
+  color: #333;
+}
+
+.switch-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.switch {
+  width: 80rpx;
+  height: 46rpx;
+  background-color: #e0e0e0;
+  border-radius: 23rpx;
+  position: relative;
+  transition: background-color 0.3s;
+}
+
+.switch.active {
+  background-color: #07c160;
+}
+
+.switch-dot {
+  width: 40rpx;
+  height: 40rpx;
+  background-color: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 3rpx;
+  left: 3rpx;
+  transition: transform 0.3s;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2);
+}
+
+.switch-dot.active {
+  transform: translateX(34rpx);
+}

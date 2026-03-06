@@ -1,0 +1,48 @@
+<!-- pages/settings/accountSecurity.wxml -->
+<view class="page">
+  <view class="header">
+    <view class="header-left" bindtap="goBack">
+      <text class="back-icon">‹</text>
+    </view>
+    <view class="header-title">账号与安全</view>
+    <view class="header-right empty"></view>
+  </view>
+
+  <view class="settings-section">
+    <view class="setting-item" bindtap="changePassword">
+      <view class="setting-left">
+        <text class="setting-icon">🔐</text>
+        <text class="setting-text">修改密码</text>
+      </view>
+      <view class="setting-right">
+        <text class="setting-arrow">›</text>
+      </view>
+    </view>
+    
+    <view class="setting-item" bindtap="bindPhone">
+      <view class="setting-left">
+        <text class="setting-icon">📱</text>
+        <text class="setting-text">绑定手机号</text>
+      </view>
+      <view class="setting-right">
+        <text class="setting-value">{{phoneNumber}}</text>
+        <text class="setting-arrow">›</text>
+      </view>
+    </view>
+    
+    <view class="setting-item" bindtap="bindEmail">
+      <view class="setting-left">
+        <text class="setting-icon">✉️</text>
+        <text class="setting-text">绑定邮箱</text>
+      </view>
+      <view class="setting-right">
+        <text class="setting-value">{{email}}</text>
+        <text class="setting-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="tips">
+    <text class="tips-text">💡 建议定期修改密码，确保账号安全</text>
+  </view>
+</view>

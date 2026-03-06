@@ -1,0 +1,147 @@
+<!-- pages/help/help.wxml -->
+<view class="container">
+  <!-- 页面头部 -->
+  <view class="header">
+    <view class="back-btn empty"></view>
+    <view class="title">帮助中心</view>
+    <view class="empty"></view>
+  </view>
+
+  <!-- 常见问题 -->
+  <view class="section">
+    <view class="section-title">
+      <text class="title-text">常见问题</text>
+    </view>
+    <view class="faq-list">
+      <view wx:for="{{faqs}}" wx:key="id"
+            class="faq-item {{item.expanded ? 'expanded' : ''}}"
+            bindtap="toggleFaq"
+            data-id="{{item.id}}">
+        <view class="faq-header">
+          <text class="faq-question">{{item.question}}</text>
+          <view class="faq-icon {{item.expanded ? 'rotate' : ''}}">
+            <text>↓</text>
+          </view>
+        </view>
+        <view class="faq-answer">
+          <text>{{item.answer}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 联系客服 -->
+  <view class="section">
+    <view class="section-title">
+      <text class="title-text">联系客服</text>
+    </view>
+    <view class="contact-info">
+      <view class="contact-item">
+        <view class="contact-icon phone-icon">
+          <image src="https://picsum.photos/seed/phone/40/40" mode="aspectFit"></image>
+        </view>
+        <view class="contact-content">
+          <text class="contact-label">客服电话</text>
+          <text class="contact-value">{{contactInfo.phone}}</text>
+        </view>
+        <button class="contact-btn" bindtap="makePhoneCall">拨打</button>
+      </view>
+      <view class="contact-item">
+        <view class="contact-icon email-icon">
+          <image src="https://picsum.photos/seed/email/40/40" mode="aspectFit"></image>
+        </view>
+        <view class="contact-content">
+          <text class="contact-label">邮箱联系</text>
+          <text class="contact-value">{{contactInfo.email}}</text>
+        </view>
+        <button class="contact-btn" bindtap="copyEmail">复制</button>
+      </view>
+      <view class="contact-item">
+        <view class="contact-icon time-icon">
+          <image src="https://picsum.photos/seed/time/40/40" mode="aspectFit"></image>
+        </view>
+        <view class="contact-content">
+          <text class="contact-label">工作时间</text>
+          <text class="contact-value">{{contactInfo.workingHours}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 意见反馈 -->
+  <view class="section">
+    <view class="section-title">
+      <text class="title-text">意见反馈</text>
+    </view>
+    <view class="feedback-form">
+      <!-- 反馈类型 -->
+      <view class="form-item">
+        <text class="form-label">反馈类型</text>
+        <view class="form-control">
+          <radio-group class="radio-group" bindchange="selectFeedbackType"
+                        value="{{feedbackForm.type}}">
+            <view wx:for="{{feedbackTypes}}" wx:key="value"
+                  class="radio-item">
+              <radio value="{{item.value}}">{{item.label}}</radio>
+            </view>
+          </radio-group>
+        </view>
+      </view>
+
+      <!-- 反馈内容 -->
+      <view class="form-item">
+        <text class="form-label">反馈内容 *</text>
+        <view class="form-control">
+          <textarea placeholder="请详细描述您的问题或建议..."
+                    value="{{feedbackForm.content}}"
+                    bindinput="inputContent"
+                    maxlength="{{maxContentLength}}"
+                    class="textarea"></textarea>
+          <text class="char-count">{{feedbackForm.content.length}}/{{maxContentLength}}</text>
+        </view>
+      </view>
+
+      <!-- 联系方式 -->
+      <view class="form-item">
+        <text class="form-label">联系方式（选填）</text>
+        <view class="form-control">
+          <input placeholder="请留下您的手机号或邮箱，方便我们联系您"
+                 value="{{feedbackForm.contact}}"
+                 bindinput="inputContact"
+                 class="input"></input>
+        </view>
+      </view>
+
+      <!-- 上传图片 -->
+      <view class="form-item">
+        <text class="form-label">上传图片（选填）</text>
+        <view class="image-upload">
+          <view wx:for="{{feedbackForm.images}}" wx:key="index" class="image-item">
+            <image src="{{item}}" mode="aspectFit"></image>
+            <view class="delete-image" data-index="{{index}}" bindtap="deleteImage">
+              <text>×</text>
+            </view>
+          </view>
+          <view wx:if="{{feedbackForm.images.length < 5}}" class="add-image" bindtap="uploadImage">
+            <image src="https://picsum.photos/seed/add/40/40" mode="aspectFit"></image>
+            <text>添加图片\n（最多5张）</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 提交按钮 -->
+      <view class="submit-section">
+        <button class="submit-btn" bindtap="submitFeedback">提交反馈</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部链接 -->
+  <view class="bottom-links">
+    <view class="link-item" bindtap="goToUserAgreement">用户协议</view>
+    <view class="link-divider">|</view>
+    <view class="link-item" bindtap="goToPrivacyPolicy">隐私政策</view>
+    <view class="link-divider">|</view>
+    <view class="link-item" bindtap="goToAboutUs">关于我们</view>
+  </view>
+</view>

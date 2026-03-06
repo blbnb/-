@@ -1,0 +1,51 @@
+<!-- pages/settings/about.wxml -->
+<view class="page">
+  <view class="header">
+    <view class="header-left" bindtap="goBack">
+      <text class="back-icon">‹</text>
+    </view>
+    <view class="header-title">关于我们</view>
+    <view class="header-right empty"></view>
+  </view>
+
+  <view class="about-container">
+    <view class="app-info">
+      <view class="app-logo">
+        <text class="logo-icon">📚</text>
+      </view>
+      <text class="app-name">{{appName}}</text>
+      <text class="app-version">版本 {{appVersion}}</text>
+    </view>
+
+    <view class="company-info">
+      <view class="info-item">
+        <text class="info-label">公司名称:</text>
+        <text class="info-value">{{companyName}}</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">官方网站:</text>
+        <view class="info-link" bindtap="openWebsite">
+          <text class="info-value">{{website}}</text>
+          <text class="info-arrow">›</text>
+        </view>
+      </view>
+      <view class="info-item">
+        <text class="info-label">联系邮箱:</text>
+        <view class="info-link" bindtap="contactUs">
+          <text class="info-value">{{email}}</text>
+          <text class="info-arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="action-section">
+      <button class="action-btn" bindtap="contactUs">
+        联系客服
+      </button>
+    </view>
+
+    <view class="copyright">
+      <text class="copyright-text">{{copyright}}</text>
+    </view>
+  </view>
+</view>

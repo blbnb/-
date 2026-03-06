@@ -1,0 +1,326 @@
+/* pages/detail/detail.wxss */
+.container {
+  padding-bottom: 120rpx;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 200rpx 0;
+}
+
+.loading-spinner {
+  width: 80rpx;
+  height: 80rpx;
+  border: 8rpx solid #f3f3f3;
+  border-top: 8rpx solid #4F46E5;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 30rpx;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading text {
+  font-size: 28rpx;
+  color: #666;
+}
+
+/* 头部图片区域 */
+.header-section {
+  background-color: #fff;
+  padding: 40rpx;
+  display: flex;
+  gap: 30rpx;
+  border-bottom: 8rpx solid #f0f0f0;
+}
+
+.book-image {
+  flex-shrink: 0;
+  width: 240rpx;
+  height: 330rpx;
+  background-color: #f8f8f8;
+  border-radius: 12rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+}
+
+.book-image image {
+  width: 100%;
+  height: 100%;
+}
+
+/* 图书基本信息 */
+.book-basic-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.book-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  line-height: 1.4;
+  margin-bottom: 15rpx;
+}
+
+.book-author {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 20rpx;
+}
+
+.price-container {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 20rpx;
+}
+
+.book-price {
+  font-size: 48rpx;
+  color: #EF4444;
+  font-weight: bold;
+}
+
+.original-price {
+  font-size: 28rpx;
+  color: #999;
+  text-decoration: line-through;
+  margin-left: 15rpx;
+}
+
+.discount-tag {
+  font-size: 24rpx;
+  color: #fff;
+  background-color: #EF4444;
+  padding: 4rpx 16rpx;
+  border-radius: 16rpx;
+  margin-left: 15rpx;
+}
+
+.stats-container {
+  display: flex;
+  gap: 30rpx;
+  padding-top: 10rpx;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.stat-icon {
+  margin-right: 6rpx;
+}
+
+/* 内容信息区域 */
+.content-section {
+  background-color: #fff;
+  margin-top: 20rpx;
+  padding: 30rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+  padding-bottom: 15rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -2rpx;
+  left: 0;
+  width: 80rpx;
+  height: 6rpx;
+  background-color: #4F46E5;
+  border-radius: 3rpx;
+}
+
+/* 图书详细信息 */
+.book-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25rpx 0;
+  margin-bottom: 30rpx;
+}
+
+.meta-item {
+  font-size: 28rpx;
+  color: #666;
+  display: flex;
+  align-items: center;
+}
+
+.meta-label {
+  color: #999;
+  margin-right: 10rpx;
+}
+
+/* 图书描述 */
+.book-description {
+  font-size: 28rpx;
+  line-height: 1.8;
+  color: #333;
+  text-indent: 56rpx;
+  padding: 10rpx 0;
+}
+
+/* 卖家信息 */
+.seller-info {
+  margin-top: 30rpx;
+  padding-top: 30rpx;
+  border-top: 2rpx solid #f0f0f0;
+}
+
+.seller-item {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 15rpx;
+}
+
+.no-data {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 100rpx 0;
+  color: #999;
+}
+
+/* 底部操作栏 */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100rpx;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 20rpx;
+  box-shadow: 0 -3rpx 15rpx rgba(0, 0, 0, 0.08);
+  z-index: 999;
+}
+
+/* 调整主容器底部内边距以适应缩小的导航条 */
+.container {
+  padding-bottom: 100rpx;
+}
+
+.quantity-control {
+  display: flex;
+  align-items: center;
+  background-color: #f8f9fa;
+  border-radius: 30rpx;
+  padding: 0 8rpx;
+  height: 66rpx;
+  margin-right: 15rpx;
+}
+
+.btn-minus, .btn-plus {
+  width: 50rpx;
+  height: 50rpx;
+  border-radius: 50%;
+  background-color: #4F46E5;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.btn-minus:active, .btn-plus:active {
+  transform: scale(0.95);
+  opacity: 0.9;
+}
+
+.btn-minus.disabled, .btn-plus.disabled {
+  color: #ccc;
+  background-color: #e0e0e0;
+}
+
+.quantity {
+  margin: 0 20rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  min-width: 50rpx;
+  text-align: center;
+  color: #333;
+}
+
+.action-buttons {
+  flex: 1;
+  display: flex;
+  gap: 15rpx;
+}
+
+.btn {
+  flex: 1;
+  height: 66rpx;
+  border-radius: 33rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 500;
+  transition: all 0.2s;
+  box-shadow: 0 3rpx 10rpx rgba(0, 0, 0, 0.08);
+}
+
+.btn:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+/* 收藏按钮 - 星号样式 */
+.btn.favorite {
+  background-color: #fff;
+  color: #F59E0B;
+  border: none;
+  flex: 0.6;
+}
+
+.btn.favorite.favorited {
+  background-color: #F59E0B;
+  color: #fff;
+}
+
+/* 星号图标样式 */
+.star-icon {
+  font-size: 48rpx;
+  display: block;
+  transition: all 0.2s;
+}
+
+.btn.favorite.favorited .star-icon {
+  transform: scale(1.1);
+}
+
+.btn.add-to-cart {
+  background-color: #F97316;
+  color: #fff;
+  border: none;
+}
+
+.btn.buy-now {
+  background-color: #4F46E5;
+  color: #fff;
+  border: none;
+}

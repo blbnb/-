@@ -1,0 +1,131 @@
+<!-- pages/points/points.wxml -->
+<view class="page">
+  <view class="header">
+    <view class="header-left empty"></view>
+    <view class="header-title">我的积分</view>
+    <view class="header-right"></view>
+  </view>
+
+  <!-- 积分余额 -->
+  <view class="points-balance">
+    <view class="balance-container">
+      <text class="points-label">当前积分</text>
+      <text class="points-value">{{totalPoints}}</text>
+      <button class="exchange-btn" bindtap="goToExchange">去兑换</button>
+    </view>
+  </view>
+
+  <!-- 标签切换 -->
+  <view class="tab-container">
+    <view 
+      class="tab-item {{activeTab === 'history' ? 'active' : ''}}" 
+      data-tab="history"
+      bindtap="switchTab"
+    >
+      积分记录
+    </view>
+    <view 
+      class="tab-item {{activeTab === 'rules' ? 'active' : ''}}" 
+      data-tab="rules"
+      bindtap="switchTab"
+    >
+      积分规则
+    </view>
+  </view>
+
+  <!-- 积分记录 -->
+  <view class="content-container" wx:if="{{activeTab === 'history'}}">
+    <!-- 加载中 -->
+    <view wx:if="{{loading}}" class="loading-container">
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <!-- 积分记录列表 -->
+    <view wx:elif="{{pointsHistory.length > 0}}" class="history-list">
+      <view wx:for="{{pointsHistory}}" wx:key="id" class="history-item">
+        <view class="history-left">
+          <view class="history-icon">
+            <text wx:if="{{item.type === 'buy'}}">📚</text>
+            <text wx:elif="{{item.type === 'checkin'}}">✅</text>
+            <text wx:elif="{{item.type === 'comment'}}">💬</text>
+            <text wx:elif="{{item.type === 'exchange'}}">🎁</text>
+          </view>
+          <view class="history-info">
+            <text class="history-desc">{{item.description}}</text>
+            <text class="history-time">{{item.date}} {{item.time}}</text>
+          </view>
+        </view>
+        <view class="history-right">
+          <text class="history-points {{item.points > 0 ? 'points-in' : 'points-out'}}">
+            {{item.points > 0 ? '+' : ''}}{{item.points}}
+          </text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:else class="empty-container">
+      <text class="empty-icon">📝</text>
+      <text class="empty-text">暂无积分记录</text>
+    </view>
+  </view>
+
+  <!-- 积分规则 -->
+  <view class="content-container" wx:if="{{activeTab === 'rules'}}">
+    <view class="rules-container">
+      <view class="rule-section">
+        <view class="rule-title">如何获取积分</view>
+        <view class="rule-item">
+          <view class="rule-icon">📚</view>
+          <view class="rule-content">
+            <text class="rule-text">购买书籍：每消费1元获得1积分</text>
+          </view>
+        </view>
+        <view class="rule-item">
+          <view class="rule-icon">✅</view>
+          <view class="rule-content">
+            <text class="rule-text">每日签到：连续签到可获得额外积分奖励</text>
+            <text class="rule-desc">第1天：5积分，第2天：6积分，第3天：7积分，第4天：8积分，第5天及以上：10积分</text>
+          </view>
+        </view>
+        <view class="rule-item">
+          <view class="rule-icon">💬</view>
+          <view class="rule-content">
+            <text class="rule-text">评论书籍：每次评论可获得10积分</text>
+            <text class="rule-desc">优质评论可获得额外5-20积分奖励</text>
+          </view>
+        </view>
+        <view class="rule-item">
+          <view class="rule-icon">📤</view>
+          <view class="rule-content">
+            <text class="rule-text">分享推荐：成功推荐朋友注册可获得50积分</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="rule-section">
+        <view class="rule-title">积分使用规则</view>
+        <view class="rule-item">
+          <view class="rule-icon">🎁</view>
+          <view class="rule-content">
+            <text class="rule-text">积分兑换：可在积分商城兑换优惠券或礼品</text>
+          </view>
+        </view>
+        <view class="rule-item">
+          <view class="rule-icon">💰</view>
+          <view class="rule-content">
+            <text class="rule-text">积分抵现：每100积分可抵1元现金</text>
+            <text class="rule-desc">单笔订单最高可使用订单金额30%的积分</text>
+          </view>
+        </view>
+        <view class="rule-item">
+          <view class="rule-icon">⏰</view>
+          <view class="rule-content">
+            <text class="rule-text">积分有效期：自获得之日起1年内有效</text>
+            <text class="rule-desc">过期积分将自动清零，请及时使用</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

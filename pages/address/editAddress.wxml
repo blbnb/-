@@ -1,0 +1,80 @@
+<!-- pages/address/editAddress.wxml -->
+<view class="page">
+  <view class="header">
+    <view class="header-left empty"></view>
+    <view class="header-title">{{isEdit ? '编辑地址' : '添加地址'}}</view>
+    <view class="header-right" bindtap="saveAddress">
+      <text class="save-btn">保存</text>
+    </view>
+  </view>
+
+  <view class="form-container">
+    <!-- 收件人 -->
+    <view class="form-item">
+      <view class="form-label">收件人</view>
+      <input 
+        class="form-input" 
+        placeholder="请输入收件人姓名" 
+        value="{{name}}"
+        data-field="name"
+        bindinput="onInputChange"
+      />
+    </view>
+
+    <!-- 手机号 -->
+    <view class="form-item">
+      <view class="form-label">手机号</view>
+      <input 
+        class="form-input" 
+        placeholder="请输入联系电话" 
+        value="{{phone}}"
+        data-field="phone"
+        bindinput="onInputChange"
+        type="number"
+        maxlength="11"
+      />
+    </view>
+
+    <!-- 地区选择 -->
+    <view class="form-item">
+      <view class="form-label">所在地区</view>
+      <picker 
+        class="form-picker" 
+        mode="region" 
+        value="{{region}}" 
+        bindchange="onRegionChange"
+      >
+        <view class="picker-view">
+          {{province}}{{city}}{{district}} 
+          <text wx:if="{{!province || !city || !district}}" class="placeholder">请选择省市区</text>
+          <text class="picker-arrow">›</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 详细地址 -->
+    <view class="form-item">
+      <view class="form-label">详细地址</view>
+      <textarea 
+        class="form-textarea" 
+        placeholder="请输入详细地址信息" 
+        value="{{detail}}"
+        data-field="detail"
+        bindinput="onInputChange"
+        maxlength="100"
+        show-confirm-bar="false"
+        auto-height
+      />
+    </view>
+
+    <!-- 设为默认地址 -->
+    <view class="default-option" bindtap="toggleDefault">
+      <view class="default-text">设为默认收货地址</view>
+      <view class="switch-wrapper">
+        <view class="switch {{isDefault ? 'active' : ''}}">
+          <view class="switch-dot {{isDefault ? 'active' : ''}}"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

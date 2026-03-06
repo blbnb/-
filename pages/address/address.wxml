@@ -1,0 +1,89 @@
+<!-- pages/address/address.wxml -->
+<view class="page">
+  <view class="header">
+    <view class="header-left empty"></view>
+    <view class="header-title">{{fromCheckout ? '选择收货地址' : '收货地址'}}</view>
+    <view class="header-right"></view>
+  </view>
+
+  <view class="address-list" wx:if="!loading">
+    <block wx:if="{{addresses.length > 0}}">
+      <view 
+        class="address-item {{fromCheckout ? 'selectable' : ''}} {{selectedAddressId === item.id ? 'selected' : ''}}"
+        wx:for="{{addresses}}" 
+        wx:key="id"
+        wx:if="{{fromCheckout}}"
+        bindtap="selectAddress" 
+        data-id="{{item.id}}"
+      >
+        <view class="address-header">
+          <text class="name">{{item.name}}</text>
+          <text class="phone">{{item.phone}}</text>
+          <text class="default" wx:if="{{item.isDefault}}">默认</text>
+        </view>
+        <view class="address-content">
+          <text>{{item.province}}{{item.city}}{{item.district}}{{item.detail}}</text>
+        </view>
+        <view class="address-actions">
+          <view class="select-icon" wx:if="{{selectedAddressId === item.id}}">✓</view>
+        </view>
+      </view>
+      
+      <view 
+        class="address-item" 
+        wx:for="{{addresses}}" 
+        wx:key="id"
+        wx:if="{{!fromCheckout}}"
+      >
+        <view class="address-header">
+          <text class="name">{{item.name}}</text>
+          <text class="phone">{{item.phone}}</text>
+          <text class="default" wx:if="{{item.isDefault}}">默认</text>
+        </view>
+        <view class="address-content">
+          <text>{{item.province}}{{item.city}}{{item.district}}{{item.detail}}</text>
+        </view>
+        <view class="address-actions">
+          <view 
+            class="action-btn" 
+            bindtap="setDefaultAddress" 
+            data-id="{{item.id}}"
+            wx:if="{{!item.isDefault}}"
+          >
+            设为默认
+          </view>
+          <view class="action-divider"></view>
+          <view 
+            class="action-btn" 
+            bindtap="editAddress" 
+            data-id="{{item.id}}"
+          >
+            编辑
+          </view>
+          <view class="action-divider"></view>
+          <view 
+            class="action-btn delete" 
+            bindtap="deleteAddress" 
+            data-id="{{item.id}}"
+          >
+            删除
+          </view>
+        </view>
+      </view>
+    </block>
+    
+    <view class="empty-address" wx:else>
+      <text class="empty-icon">📦</text>
+      <text class="empty-text">暂无收货地址</text>
+    </view>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view class="add-btn" bindtap="addNewAddress">
+    <text class="add-icon">+</text>
+    <text class="add-text">新增收货地址</text>
+  </view>
+</view>

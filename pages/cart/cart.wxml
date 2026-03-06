@@ -1,0 +1,50 @@
+<!-- 购物车页面 -->
+<view class="page">
+  <view class="header">
+    <text class="title">购物车</text>
+  </view>
+
+  <view class="content">
+    <!-- 购物车列表 -->
+    <view class="cart-list" wx:if="{{cart.length > 0}}">
+      <view class="cart-item" wx:for="{{cart}}" wx:key="index">
+        <view class="checkbox" bindtap="toggleSelect" data-index="{{index}}">
+          <view class="checkbox-inner" wx:if="{{item.selected}}">✓</view>
+        </view>
+        <image src="{{item.image}}" mode="aspectFill"></image>
+        <view class="cart-info">
+          <text class="book-title">{{item.title}}</text>
+          <text class="book-price">¥{{item.price}}</text>
+          <view class="quantity-control">
+            <view class="btn-minus" bindtap="decreaseQuantity" data-index="{{index}}" wx:if="{{item.quantity > 1}}">-</view>
+            <view class="btn-minus disabled" wx:else>-</view>
+            <text class="quantity">{{item.quantity}}</text>
+            <view class="btn-plus" bindtap="increaseQuantity" data-index="{{index}}">+</view>
+          </view>
+        </view>
+        <view class="btn-delete" bindtap="deleteItem" data-index="{{index}}">删除</view>
+      </view>
+    </view>
+
+    <!-- 空购物车提示 -->
+    <view class="empty-cart" wx:else>
+      <text class="empty-icon">🛒</text>
+      <text class="empty-text">购物车还是空的，快去挑选图书吧！</text>
+      <button class="go-shopping" bindtap="goToHome">去逛逛</button>
+    </view>
+  </view>
+
+  <!-- 底部结算栏 -->
+  <view class="footer" wx:if="{{cart.length > 0}}">
+    <view class="select-all">
+      <view class="checkbox" bindtap="toggleSelectAll">
+        <view class="checkbox-inner" wx:if="{{selectAll}}">✓</view>
+      </view>
+      <text>全选</text>
+    </view>
+    <view class="total">
+      <text>合计：¥{{totalPrice}}</text>
+    </view>
+    <button class="checkout-btn" disabled="{{!hasSelected}}" bindtap="goToCheckout">结算</button>
+  </view>
+</view>

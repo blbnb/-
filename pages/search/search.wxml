@@ -1,0 +1,83 @@
+<!-- 搜索页面 -->
+<view class="page">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input-wrapper">
+      <view class="search-input">
+        <text class="icon-search">🔍</text>
+        <input 
+          type="text" 
+          placeholder="搜索图书名称、作者或标签..." 
+          placeholder-class="placeholder" 
+          value="{{keyword}}"
+          bindinput="onInput"
+          bindconfirm="onSearch"
+        />
+      </view>
+      <text class="search-btn" bindtap="onSearch">搜索</text>
+    </view>
+  </view>
+
+  <!-- 搜索内容区域 -->
+  <view class="content">
+    <!-- 加载中 -->
+    <view class="loading" wx:if="{{loading}}">
+      <text>搜索中...</text>
+    </view>
+    
+    <!-- 无结果 -->
+    <view class="no-results" wx:elif="{{noResults}}">
+      <text class="no-results-icon">🔍</text>
+      <text class="no-results-text">没有找到相关图书</text>
+      <text class="no-results-hint">试试其他关键词吧</text>
+    </view>
+    
+    <!-- 搜索结果 -->
+    <view class="search-results" wx:elif="{{searchResults.length > 0}}">
+      <view class="results-header">
+        <text>找到 {{searchResults.length}} 本相关图书</text>
+      </view>
+      <view class="book-list">
+        <view class="book-item" wx:for="{{searchResults}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+          <view class="book-img-container">
+            <image src="{{item.image}}" mode="aspectFill"></image>
+            <text class="book-tag" wx:if="{{item.tags && item.tags.length > 0}}">{{item.tags[0]}}</text>
+          </view>
+          <view class="book-info">
+            <text class="book-title">{{item.title}}</text>
+            <text class="book-author" wx:if="{{item.author}}">{{item.author}}</text>
+            <view class="price-container">
+              <text class="book-price">¥{{item.price}}</text>
+              <text class="original-price" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+              <text class="discount-tag" wx:if="{{item.originalPrice}}">{{Math.round(item.price / item.originalPrice * 10)}}折</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 默认显示搜索历史和热门搜索 -->
+    <view class="search-default" wx:else>
+      <!-- 搜索历史 -->
+      <view class="history-section" wx:if="{{searchHistory && searchHistory.length > 0}}">
+        <view class="section-header">
+          <text class="section-title">搜索历史</text>
+          <text class="clear-btn" bindtap="clearHistory">清除</text>
+        </view>
+        <view class="history-tags">
+          <view class="history-tag" wx:for="{{searchHistory}}" wx:key="index" bindtap="searchByKeyword" data-keyword="{{item}}">{{item}}</view>
+        </view>
+      </view>
+      
+      <!-- 热门搜索 -->
+      <view class="hot-section">
+        <view class="section-header">
+          <text class="section-title">热门搜索</text>
+        </view>
+        <view class="hot-tags">
+          <view class="hot-tag" wx:for="{{hotKeywords}}" wx:key="index" bindtap="searchByKeyword" data-keyword="{{item}}">{{item}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

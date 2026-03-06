@@ -1,0 +1,66 @@
+<!-- pages/checkout/checkout.wxml -->
+<view class="page">
+  <view class="header">
+    <text class="title">确认订单</text>
+  </view>
+
+  <!-- 地址信息 -->
+  <view class="address-section" bindtap="selectAddress">
+    <view class="address-content">
+      <view class="address-header">
+        <text class="name">{{selectedAddress ? selectedAddress.name : '未设置'}}</text>
+        <text class="phone">{{selectedAddress ? selectedAddress.phone : ''}}</text>
+      </view>
+      <view class="address-detail">
+        {{selectedAddress ? (selectedAddress.province + selectedAddress.city + selectedAddress.district + selectedAddress.detail) : '请选择收货地址'}}
+      </view>
+    </view>
+    <view class="address-arrow">›</view>
+  </view>
+
+  <!-- 商品清单 -->
+  <view class="goods-section">
+    <view class="section-title">商品清单</view>
+    <view class="goods-list">
+      <view class="goods-item" wx:for="{{checkoutItems}}" wx:key="id">
+        <image class="goods-image" src="{{item.image || 'https://picsum.photos/seed/book/200/280'}}"></image>
+        <view class="goods-info">
+          <view class="goods-title">{{item.title}}</view>
+          <view class="goods-author">{{item.author}}</view>
+          <view class="goods-meta">
+            <text class="goods-price">¥{{item.price}}</text>
+            <text class="goods-quantity">x{{item.quantity}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 价格信息 -->
+  <view class="price-section">
+    <view class="price-item">
+      <text class="price-label">商品总价</text>
+      <text class="price-value">¥{{totalPrice}}</text>
+    </view>
+    <view class="price-item">
+      <text class="price-label">运费</text>
+      <text class="price-value">免运费</text>
+    </view>
+    <view class="price-item total">
+      <text class="total-label">实付款</text>
+      <text class="total-value">¥{{totalPrice}}</text>
+    </view>
+  </view>
+
+  <!-- 底部结算栏 -->
+  <view class="bottom-bar">
+    <view class="total-info">
+      <text class="total-text">合计：</text>
+      <text class="total-amount">¥{{totalPrice}}</text>
+      <view class="actions">
+        <button class="cancel-btn" bindtap="cancelOrder" loading="{{loading}}">取消</button>
+        <button class="submit-btn" bindtap="submitOrder" loading="{{loading}}">提交订单</button>
+      </view>
+    </view>
+  </view>
+</view>

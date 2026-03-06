@@ -1,0 +1,76 @@
+<!-- pages/settings/notificationSettings.wxml -->
+<view class="page">
+  <view class="header">
+    <view class="header-left" bindtap="goBack">
+      <text class="back-icon">‹</text>
+    </view>
+    <view class="header-title">消息通知设置</view>
+    <view class="header-right empty"></view>
+  </view>
+
+  <view class="section-title">通知类型设置</view>
+  <view class="settings-section">
+    <view class="setting-item">
+      <view class="setting-left">
+        <text class="setting-icon">📦</text>
+        <text class="setting-text">订单通知</text>
+        <text class="setting-desc">订单状态变更、发货通知等</text>
+      </view>
+      <view class="setting-right">
+        <switch checked="{{isOrderNotificationEnabled}}" bindchange="toggleOrderNotification" color="#ff6600"></switch>
+      </view>
+    </view>
+    </view>
+
+  <view class="settings-section">
+    <view class="setting-item">
+      <view class="setting-left">
+        <text class="setting-icon">🎁</text>
+        <text class="setting-text">促销活动通知</text>
+        <text class="setting-desc">限时优惠、新书上架等活动信息</text>
+      </view>
+      <view class="setting-right">
+        <switch checked="{{isPromotionNotificationEnabled}}" bindchange="togglePromotionNotification" color="#ff6600"></switch>
+      </view>
+    </view>
+    </view>
+
+  <view class="settings-section">
+    <view class="setting-item">
+      <view class="setting-left">
+        <text class="setting-icon">⚙️</text>
+        <text class="setting-text">系统通知</text>
+        <text class="setting-desc">系统维护、版本更新等信息</text>
+      </view>
+      <view class="setting-right">
+        <switch checked="{{isSystemNotificationEnabled}}" bindchange="toggleSystemNotification" color="#ff6600"></switch>
+      </view>
+    </view>
+    </view>
+
+  <view class="section-title">提醒方式设置</view>
+  <view class="settings-section">
+    <view class="setting-item">
+      <view class="setting-left">
+        <text class="setting-icon">🔊</text>
+        <text class="setting-text">声音提醒</text>
+      </view>
+      <view class="setting-right">
+        <switch checked="{{isSoundEnabled}}" bindchange="toggleSound" color="#ff6600"></switch>
+      </view>
+    </view>
+    <view class="setting-item">
+      <view class="setting-left">
+        <text class="setting-icon">📳</text>
+        <text class="setting-text">震动提醒</text>
+      </view>
+      <view class="setting-right">
+        <switch checked="{{isVibrationEnabled}}" bindchange="toggleVibration" color="#ff6600"></switch>
+      </view>
+    </view>
+  </view>
+
+  <view class="tips">
+    <text class="tips-text">💡 开启通知可以及时获取订单状态和活动信息哦~</text>
+  </view>
+</view>
