@@ -58,7 +58,11 @@
           </view>
           <view class="order-actions">
             <!-- 根据订单状态显示不同的操作按钮 -->
-            <block wx:if="{{item.status === 'pending'}}">
+            <block wx:if="{{item.status === 'unpaid'}}">
+              <button class="btn-secondary" size="mini" data-id="{{item.id}}" bindtap="cancelUnpaidOrder">取消订单</button>
+              <button class="btn-primary" size="mini" data-id="{{item.id}}" bindtap="continuePay">继续支付</button>
+            </block>
+            <block wx:elif="{{item.status === 'pending'}}">
               <button class="btn-secondary" size="mini" data-id="{{item.id}}" bindtap="cancelOrder">取消订单</button>
               <button class="btn-primary" size="mini" data-id="{{item.id}}" bindtap="payOrder">立即支付</button>
             </block>

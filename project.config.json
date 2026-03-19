@@ -45,9 +45,8 @@
   },
   "compileType": "miniprogram",
   "libVersion": "2.19.4",
-  "appid": "wx9e6a59f13b7072d2",
+  "appid": "wx5b83f55833c34d25",
   "projectname": "campus-bookstore",
-  "isGameTourist": false,
   "simulatorType": "wechat",
   "simulatorPluginLibVersion": {},
   "condition": {
@@ -64,5 +63,8 @@
       "list": []
     }
   },
-  "editorSetting": {}
+  "editorSetting": {
+    "tabIndent": "insertSpaces",
+    "tabSize": 2
+  }
 }

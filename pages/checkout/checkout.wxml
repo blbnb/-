@@ -52,6 +52,40 @@
     </view>
   </view>
 
+  <!-- 支付方式 -->
+  <view class="payment-section">
+    <view class="section-title">支付方式</view>
+    <view class="payment-list">
+      <view class="payment-item" bindtap="selectPayment" data-payment="wechat">
+        <view class="payment-info">
+          <text class="payment-icon">💳</text>
+          <text class="payment-name">微信支付</text>
+        </view>
+        <view class="payment-check {{selectedPayment === 'wechat' ? 'active' : ''}}">
+          <text wx:if="{{selectedPayment === 'wechat'}}" class="check-icon">✓</text>
+        </view>
+      </view>
+      <view class="payment-item" bindtap="selectPayment" data-payment="alipay">
+        <view class="payment-info">
+          <text class="payment-icon">💳</text>
+          <text class="payment-name">支付宝</text>
+        </view>
+        <view class="payment-check {{selectedPayment === 'alipay' ? 'active' : ''}}">
+          <text wx:if="{{selectedPayment === 'alipay'}}" class="check-icon">✓</text>
+        </view>
+      </view>
+      <view class="payment-item" bindtap="selectPayment" data-payment="card">
+        <view class="payment-info">
+          <text class="payment-icon">💳</text>
+          <text class="payment-name">银行卡</text>
+        </view>
+        <view class="payment-check {{selectedPayment === 'card' ? 'active' : ''}}">
+          <text wx:if="{{selectedPayment === 'card'}}" class="check-icon">✓</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
   <!-- 底部结算栏 -->
   <view class="bottom-bar">
     <view class="total-info">
@@ -60,6 +94,45 @@
       <view class="actions">
         <button class="cancel-btn" bindtap="cancelOrder" loading="{{loading}}">取消</button>
         <button class="submit-btn" bindtap="submitOrder" loading="{{loading}}">提交订单</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 支付密码弹窗 -->
+  <view class="password-modal {{showPasswordModal ? 'show' : ''}}">
+    <view class="modal-mask" bindtap="closePasswordModal"></view>
+    <view class="modal-content">
+      <view class="modal-header">
+        <text class="modal-title">请输入支付密码</text>
+        <view class="modal-close" bindtap="closePasswordModal">×</view>
+      </view>
+      <view class="modal-body">
+        <view class="password-amount">
+          <text class="amount-label">支付金额</text>
+          <text class="amount-value">¥{{totalPrice}}</text>
+        </view>
+        <view class="password-input-box">
+          <view class="password-dots">
+            <view class="password-dot {{password.length >= 1 ? 'filled' : ''}}"></view>
+            <view class="password-dot {{password.length >= 2 ? 'filled' : ''}}"></view>
+            <view class="password-dot {{password.length >= 3 ? 'filled' : ''}}"></view>
+            <view class="password-dot {{password.length >= 4 ? 'filled' : ''}}"></view>
+            <view class="password-dot {{password.length >= 5 ? 'filled' : ''}}"></view>
+            <view class="password-dot {{password.length >= 6 ? 'filled' : ''}}"></view>
+          </view>
+          <input 
+            type="number" 
+            class="password-input" 
+            maxlength="6" 
+            focus="{{showPasswordModal}}"
+            bindinput="onPasswordInput"
+            value="{{password}}"
+          />
+        </view>
+        <view class="password-error" wx:if="{{passwordError}}">{{passwordError}}</view>
+      </view>
+      <view class="modal-footer">
+        <view class="forget-password" bindtap="onForgetPassword">忘记密码?</view>
       </view>
     </view>
   </view>

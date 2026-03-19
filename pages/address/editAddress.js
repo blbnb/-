@@ -182,5 +182,75 @@ Page({
     return true;
   },
 
+  // 获取当前位置
+  getLocation: function() {
+    wx.showLoading({ title: '正在获取位置...' });
+    
+    // 调用微信定位API
+    wx.getLocation({
+      type: 'wgs84',
+      success: (res) => {
+        const latitude = res.latitude;
+        const longitude = res.longitude;
+        this.reverseGeocoder(latitude, longitude);
+      },
+      fail: (err) => {
+        wx.hideLoading();
+        wx.showToast({ 
+          title: '获取位置失败，请检查权限', 
+          icon: 'none' 
+        });
+        console.error('获取位置失败:', err);
+      }
+    });
+  },
+
+  // 逆地理编码，将经纬度转换为具体地址
+  reverseGeocoder: function(latitude, longitude) {
+    // 使用腾讯地图API进行逆地理编码
+    const url = `https://apis.map.qq.com/ws/geocoder/v1/?location=${latitude},${longitude}&key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77`;
+    
+    wx.request({
+      url: url,
+      method: 'GET',
+      success: (res) => {
+        wx.hideLoading();
+        if (res.data.status === 0) {
+          const address = res.data.result;
+          const province = address.address_component.province;
+          const city = address.address_component.city;
+          const district = address.address_component.district;
+          const detail = address.address_component.street + address.address_component.street_number;
+          
+          // 更新页面数据
+          this.setData({
+            province: province,
+            city: city,
+            district: district,
+            detail: detail || '',
+            region: [province, city, district]
+          });
+          
+          wx.showToast({ 
+            title: '定位成功', 
+            icon: 'success' 
+          });
+        } else {
+          wx.showToast({ 
+            title: '解析地址失败', 
+            icon: 'none' 
+          });
+        }
+      },
+      fail: (err) => {
+        wx.hideLoading();
+        wx.showToast({ 
+          title: '网络请求失败', 
+          icon: 'none' 
+        });
+        console.error('逆地理编码失败:', err);
+      }
+    });
+  }
 
 });

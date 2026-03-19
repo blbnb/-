@@ -4,9 +4,10 @@ Page({
   data: {
     orders: [],
     loading: false,
-    currentStatus: 'all', // all, pending, paid, shipped, received
+    currentStatus: 'all', // all, unpaid, pending, paid, shipped, received
     statusOptions: [
       { key: 'all', label: '全部' },
+      { key: 'unpaid', label: '未支付' },
       { key: 'pending', label: '待付款' },
       { key: 'paid', label: '待发货' },
       { key: 'shipped', label: '待收货' },
@@ -48,25 +49,41 @@ Page({
     this.setData({ loading: true });
     
     try {
-      // 模拟从本地存储获取订单数据
+      // 从本地存储获取订单数据
       let allOrders = wx.getStorageSync('orders') || [];
+      let unpaidOrders = wx.getStorageSync('unpaidOrders') || [];
+      
+      // 合并所有订单（包括未支付订单）
+      let combinedOrders = [...allOrders];
+      
+      // 添加未支付订单（去重）
+      unpaidOrders.forEach(unpaidOrder => {
+        const exists = combinedOrders.some(order => order.id === unpaidOrder.id);
+        if (!exists) {
+          combinedOrders.push(unpaidOrder);
+        }
+      });
       
       // 如果没有订单数据，使用模拟数据
-      if (allOrders.length === 0) {
-        allOrders = this.generateMockOrders();
-        wx.setStorageSync('orders', allOrders);
+      if (combinedOrders.length === 0) {
+        combinedOrders = this.generateMockOrders();
+        wx.setStorageSync('orders', combinedOrders);
       }
       
       // 根据当前状态筛选订单
-      let filteredOrders = allOrders;
+      let filteredOrders = combinedOrders;
       if (this.data.currentStatus !== 'all') {
-        filteredOrders = allOrders.filter(order => order.status === this.data.currentStatus);
+        filteredOrders = combinedOrders.filter(order => order.status === this.data.currentStatus);
       }
       
       // 计算每个订单的商品总数（如果没有totalItems属性）
       filteredOrders = filteredOrders.map(order => {
         if (!order.totalItems && order.items && order.items.length) {
           order.totalItems = order.items.reduce((sum, product) => sum + product.quantity, 0);
+        }
+        // 统一字段名
+        if (!order.totalAmount && order.totalPrice) {
+          order.totalAmount = order.totalPrice;
         }
         return order;
       });
@@ -275,6 +292,7 @@ Page({
   // 获取订单状态文本
   getStatusText: function(status) {
     const statusMap = {
+      unpaid: '未支付',
       pending: '待付款',
       paid: '待发货',
       shipped: '待收货',
@@ -283,6 +301,61 @@ Page({
       completed: '已完成'
     };
     return statusMap[status] || '未知状态';
+  },
+
+  // 继续支付未支付订单
+  continuePay: function(e) {
+    const orderId = e.currentTarget.dataset.id;
+    const order = this.data.orders.find(o => o.id === orderId);
+    
+    if (!order) {
+      wx.showToast({
+        title: '订单不存在',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    // 将订单信息设置到全局数据，跳转到支付页面
+    app.globalData.checkoutItems = order.items;
+    app.globalData.currentOrderId = orderId;
+    
+    wx.navigateTo({
+      url: '/pages/checkout/checkout?orderId=' + orderId + '&fromUnpaid=true'
+    });
+  },
+
+  // 取消未支付订单
+  cancelUnpaidOrder: function(e) {
+    const orderId = e.currentTarget.dataset.id;
+    wx.showModal({
+      title: '确认取消',
+      content: '确定要取消该订单吗？',
+      success: res => {
+        if (res.confirm) {
+          // 从未支付订单中移除
+          let unpaidOrders = wx.getStorageSync('unpaidOrders') || [];
+          unpaidOrders = unpaidOrders.filter(order => order.id !== orderId);
+          wx.setStorageSync('unpaidOrders', unpaidOrders);
+          
+          // 从所有订单中更新状态
+          let allOrders = wx.getStorageSync('allOrders') || [];
+          allOrders = allOrders.map(order => {
+            if (order.id === orderId) {
+              return { ...order, status: 'cancelled' };
+            }
+            return order;
+          });
+          wx.setStorageSync('allOrders', allOrders);
+          
+          wx.showToast({
+            title: '订单已取消',
+            icon: 'success'
+          });
+          this.loadOrders();
+        }
+      }
+    });
   },
 
 });
