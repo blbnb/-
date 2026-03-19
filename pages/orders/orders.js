@@ -231,9 +231,9 @@ Page({
   // 支付订单
   payOrder: function(e) {
     const orderId = e.currentTarget.dataset.id;
-    wx.showToast({
-      title: '支付功能开发中',
-      icon: 'none'
+    // 跳转到支付页面
+    wx.redirectTo({
+      url: `/pages/payment/payment?orderId=${orderId}`
     });
   },
 

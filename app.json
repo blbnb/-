@@ -15,6 +15,7 @@
     "pages/points/points",
     "pages/settings/settings",
     "pages/checkout/checkout",
+    "pages/payment/payment",
     "pages/orders/orders",
     "pages/notifications/notifications",
     "pages/help/help",

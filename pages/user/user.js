@@ -238,15 +238,7 @@ Page({
     // 显示加载提示
     wx.showLoading({ title: '登录中...' });
     
-    // 在开发环境中，直接使用本地登录模式以避免域名白名单限制
-    // 跳过wx.request，直接调用handleLocalLogin
-    console.log('使用开发模式：跳过网络请求，直接本地登录');
-    wx.hideLoading();
-    this.handleLocalLogin(userInfo, phoneData);
-    
-    /*
-    // 注释掉实际的网络请求，开发环境暂时不使用
-    // 在生产环境中，需要在微信小程序管理后台配置合法域名
+    // 调用后端API进行登录
     wx.request({
       url: app.globalData.baseUrl + '/login',
       method: 'POST',
@@ -293,36 +285,26 @@ Page({
               });
             } else {
               console.error('登录数据异常:', response.data);
-              // 切换到本地登录模式
-              this.handleLocalLogin(userInfo, phoneData);
+              wx.showToast({ title: '登录失败，请重试', icon: 'none' });
             }
           } else {
             console.error('登录失败，状态码:', response.statusCode);
-            // 切换到本地登录模式
-            this.handleLocalLogin(userInfo, phoneData);
+            wx.showToast({ title: '登录失败，请重试', icon: 'none' });
           }
         } catch (e) {
           console.error('处理登录响应时出错:', e);
-          // 切换到本地登录模式
-          this.handleLocalLogin(userInfo, phoneData);
+          wx.showToast({ title: '登录失败，请重试', icon: 'none' });
         }
       },
       fail: (err) => {
         console.error('登录请求网络失败:', err);
-        // 隐藏加载提示
-        wx.hideLoading();
-        
-        // 直接切换到本地登录模式，不再显示错误提示
-        this.handleLocalLogin(userInfo, phoneData);
+        wx.showToast({ title: '网络错误，请重试', icon: 'none' });
       },
       complete: () => {
-        // 隐藏加载提示（在fail回调中已处理，这里主要处理success情况）
-        if (wx.hideLoading) {
-          wx.hideLoading();
-        }
+        // 隐藏加载提示
+        wx.hideLoading();
       }
     });
-    */
   },
   
   // 处理本地登录（当后端接口不可用时的备用方案）

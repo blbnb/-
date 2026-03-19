@@ -233,4 +233,74 @@ router.get('/my', authMiddleware, async (req, res) => {
   }
 });
 
+// 获取分类图书接口
+router.get('/category', async (req, res) => {
+  try {
+    const { category } = req.query;
+
+    // 构建查询条件
+    const where = {};
+    if (category) where.category = category;
+
+    // 查询图书列表
+    const books = await Book.findAll({
+      where,
+      order: [['createdAt', 'DESC']]
+    });
+
+    // 按年级和学期组织数据
+    const gradeSemesterBooks = {
+      '大一': {
+        '上学期': [],
+        '下学期': []
+      },
+      '大二': {
+        '上学期': [],
+        '下学期': []
+      },
+      '大三': {
+        '上学期': [],
+        '下学期': []
+      }
+    };
+
+    // 将图书分配到不同的年级和学期（这里简化处理，实际应该根据图书的属性进行分配）
+    books.forEach((book, index) => {
+      const gradeIndex = index % 3;
+      const semesterIndex = index % 2;
+      
+      if (gradeIndex === 0) {
+        if (semesterIndex === 0) {
+          gradeSemesterBooks['大一']['上学期'].push(book);
+        } else {
+          gradeSemesterBooks['大一']['下学期'].push(book);
+        }
+      } else if (gradeIndex === 1) {
+        if (semesterIndex === 0) {
+          gradeSemesterBooks['大二']['上学期'].push(book);
+        } else {
+          gradeSemesterBooks['大二']['下学期'].push(book);
+        }
+      } else {
+        if (semesterIndex === 0) {
+          gradeSemesterBooks['大三']['上学期'].push(book);
+        } else {
+          gradeSemesterBooks['大三']['下学期'].push(book);
+        }
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      data: gradeSemesterBooks
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: '服务器内部错误',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;

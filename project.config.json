@@ -1,7 +1,12 @@
 {
   "description": "校园二手图书交易平台",
   "packOptions": {
-    "ignore": [],
+    "ignore": [
+      {
+        "type": "directory",
+        "value": "backend"
+      }
+    ],
     "include": []
   },
   "setting": {

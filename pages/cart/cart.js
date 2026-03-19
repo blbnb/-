@@ -28,6 +28,7 @@ Page({
           'Authorization': 'Bearer ' + wx.getStorageSync('token')
         },
         success: (res) => {
+          console.log('获取购物车数据成功', res.data);
           if (res.data.success && res.data.data) {
             const cart = res.data.data.map(item => ({
               ...item,
@@ -36,13 +37,16 @@ Page({
             wx.setStorageSync('cart', cart);
             this.setData({ cart });
           } else {
-            // 使用本地存储的购物车数据
-            this.loadLocalCartData();
+            // 后端返回数据不符合预期，使用空数组
+            this.setData({ cart: [] });
+            wx.setStorageSync('cart', []);
           }
         },
-        fail: () => {
-          // 使用本地存储的购物车数据
-          this.loadLocalCartData();
+        fail: (err) => {
+          console.error('获取购物车数据失败', err);
+          // 网络请求失败，使用空数组
+          this.setData({ cart: [] });
+          wx.setStorageSync('cart', []);
         },
         complete: () => {
           this.setData({ loading: false });
@@ -50,9 +54,10 @@ Page({
         }
       });
     } else {
-      // 使用本地存储的购物车数据
-      this.loadLocalCartData();
+      // 未登录状态，使用空数组
+      this.setData({ cart: [] });
       this.setData({ loading: false });
+      this.updateCartStatus();
     }
   },
   
