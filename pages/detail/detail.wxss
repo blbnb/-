@@ -324,3 +324,44 @@
   color: #fff;
   border: none;
 }
+
+/* 成色选择器样式 */
+.condition-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  margin-top: 20rpx;
+}
+
+.condition-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  background-color: #f9fafb;
+  border: 2rpx solid #e5e7eb;
+  border-radius: 12rpx;
+  transition: all 0.3s;
+}
+
+.condition-item.active {
+  background-color: #eff6ff;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4rpx rgba(59, 130, 246, 0.1);
+}
+
+.condition-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #374151;
+}
+
+.condition-price {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #ef4444;
+}
+
+.condition-item.active .condition-price {
+  color: #3b82f6;
+}

@@ -11,7 +11,20 @@ Page({
   },
 
   onShow: function() {
+    // 检查登录状态
+    if (!app.checkLogin()) {
+      this.setData({ cart: [], loading: false });
+      return;
+    }
     this.loadCartData();
+  },
+
+  // 下拉刷新
+  onPullDownRefresh: function() {
+    this.loadCartData();
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 500);
   },
 
   // 加载购物车数据
@@ -243,6 +256,11 @@ Page({
 
   // 前往结算
   goToCheckout: function() {
+    // 检查登录状态
+    if (!app.requireLogin()) {
+      return;
+    }
+    
     const selectedItems = this.data.cart.filter(item => item.selected);
     if (selectedItems.length === 0) {
       wx.showToast({

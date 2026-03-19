@@ -46,9 +46,17 @@
       <text class="price-label">运费</text>
       <text class="price-value">免运费</text>
     </view>
+    <view class="price-item" bindtap="selectCoupon">
+      <text class="price-label">优惠券</text>
+      <view class="coupon-value">
+        <text wx:if="{{selectedCoupon}}" class="coupon-discount">-¥{{selectedCoupon.amount || selectedCoupon.discountAmount}}</text>
+        <text wx:else class="coupon-placeholder">{{availableCoupons.length > 0 ? availableCoupons.length + '张可用' : '暂无可用'}}</text>
+        <text class="picker-arrow">›</text>
+      </view>
+    </view>
     <view class="price-item total">
       <text class="total-label">实付款</text>
-      <text class="total-value">¥{{totalPrice}}</text>
+      <text class="total-value">¥{{finalPrice}}</text>
     </view>
   </view>
 
@@ -109,7 +117,7 @@
       <view class="modal-body">
         <view class="password-amount">
           <text class="amount-label">支付金额</text>
-          <text class="amount-value">¥{{totalPrice}}</text>
+          <text class="amount-value">¥{{finalPrice}}</text>
         </view>
         <view class="password-input-box">
           <view class="password-dots">
@@ -133,6 +141,43 @@
       </view>
       <view class="modal-footer">
         <view class="forget-password" bindtap="onForgetPassword">忘记密码?</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 优惠券选择弹窗 -->
+  <view class="coupon-modal {{showCouponModal ? 'show' : ''}}">
+    <view class="modal-mask" bindtap="closeCouponModal"></view>
+    <view class="coupon-modal-content">
+      <view class="modal-header">
+        <text class="modal-title">选择优惠券</text>
+        <view class="modal-close" bindtap="closeCouponModal">×</view>
+      </view>
+      <view class="coupon-modal-body">
+        <view wx:if="{{availableCoupons.length === 0}}" class="no-coupon">
+          <text>暂无可用优惠券</text>
+        </view>
+        <view wx:else class="coupon-list">
+          <view class="coupon-item {{selectedCoupon && selectedCoupon.id === item.id ? 'selected' : ''}}" 
+                wx:for="{{availableCoupons}}" 
+                wx:key="id" 
+                bindtap="chooseCoupon" 
+                data-coupon="{{item}}">
+            <view class="coupon-left">
+              <text class="coupon-amount">¥{{item.amount || item.discountAmount}}</text>
+              <text class="coupon-condition">满{{item.minAmount}}可用</text>
+            </view>
+            <view class="coupon-right">
+              <text class="coupon-name">{{item.name}}</text>
+              <text class="coupon-desc">{{item.description}}</text>
+              <text class="coupon-expire">有效期至{{item.expireDate}}</text>
+            </view>
+            <view wx:if="{{selectedCoupon && selectedCoupon.id === item.id}}" class="coupon-check">✓</view>
+          </view>
+        </view>
+      </view>
+      <view class="coupon-modal-footer">
+        <button class="confirm-btn" bindtap="confirmCoupon">确定</button>
       </view>
     </view>
   </view>

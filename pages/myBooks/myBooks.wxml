@@ -2,9 +2,6 @@
 <view class="page">
   <view class="header">
     <text class="title">我的图书</text>
-    <view class="header-right">
-      <button class="publish-btn" bindtap="publishNewBook">发布图书</button>
-    </view>
   </view>
 
   <view class="content">
@@ -17,8 +14,8 @@
     <!-- 空状态 -->
     <view class="empty" wx:elif="{{!loading && books.length === 0}}">
       <text class="empty-icon">📚</text>
-      <text class="empty-text">您还没有发布图书</text>
-      <button class="empty-btn" bindtap="publishNewBook">立即发布</button>
+      <text class="empty-text">您还没有购买图书</text>
+      <button class="empty-btn" bindtap="goToHome">去逛逛</button>
     </view>
 
     <!-- 图书列表 -->

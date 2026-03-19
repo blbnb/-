@@ -122,10 +122,10 @@ Page({
     });
   },
 
-  // 发布新图书
-  publishNewBook: function() {
-    wx.navigateTo({
-      url: '/pages/publish/publish'
+  // 前往首页
+  goToHome: function() {
+    wx.switchTab({
+      url: '/pages/index/index'
     });
   },
 

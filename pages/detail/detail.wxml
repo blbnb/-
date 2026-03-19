@@ -74,6 +74,31 @@
         </view>
       </view>
       
+      <!-- 新旧程度选择 -->
+      <view class="section-title">选择成色</view>
+      <view class="condition-selector">
+        <view class="condition-item {{selectedCondition === 'new' ? 'active' : ''}}" 
+              bindtap="selectCondition" data-condition="new" data-discount="1.0">
+          <text class="condition-name">全新</text>
+          <text class="condition-price">¥{{conditionPrices.new}}</text>
+        </view>
+        <view class="condition-item {{selectedCondition === 'almost_new' ? 'active' : ''}}" 
+              bindtap="selectCondition" data-condition="almost_new" data-discount="0.85">
+          <text class="condition-name">几乎全新</text>
+          <text class="condition-price">¥{{conditionPrices.almost_new}}</text>
+        </view>
+        <view class="condition-item {{selectedCondition === 'good' ? 'active' : ''}}" 
+              bindtap="selectCondition" data-condition="good" data-discount="0.7">
+          <text class="condition-name">良好</text>
+          <text class="condition-price">¥{{conditionPrices.good}}</text>
+        </view>
+        <view class="condition-item {{selectedCondition === 'fair' ? 'active' : ''}}" 
+              bindtap="selectCondition" data-condition="fair" data-discount="0.5">
+          <text class="condition-name">一般</text>
+          <text class="condition-price">¥{{conditionPrices.fair}}</text>
+        </view>
+      </view>
+      
       <!-- 图书描述 -->
       <view class="section-title">内容简介</view>
       <view class="book-description">{{bookDetail.description || '暂无描述'}}</view>

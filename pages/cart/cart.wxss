@@ -93,6 +93,21 @@
   font-size: 32rpx;
   font-weight: bold;
   color: #ff4757;
+  margin-bottom: 10rpx;
+}
+
+.book-meta {
+  margin-bottom: 10rpx;
+}
+
+.condition-tag {
+  display: inline-block;
+  padding: 4rpx 12rpx;
+  background-color: #f0f9ff;
+  color: #0ea5e9;
+  font-size: 22rpx;
+  border-radius: 4rpx;
+  border: 1rpx solid #bae6fd;
 }
 
 .quantity-control {

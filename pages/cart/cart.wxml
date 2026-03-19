@@ -14,6 +14,9 @@
         <image src="{{item.image}}" mode="aspectFill"></image>
         <view class="cart-info">
           <text class="book-title">{{item.title}}</text>
+          <view class="book-meta">
+            <text class="condition-tag" wx:if="{{item.conditionText}}">{{item.conditionText}}</text>
+          </view>
           <text class="book-price">¥{{item.price}}</text>
           <view class="quantity-control">
             <view class="btn-minus" bindtap="decreaseQuantity" data-index="{{index}}" wx:if="{{item.quantity > 1}}">-</view>

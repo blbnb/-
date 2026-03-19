@@ -17,6 +17,12 @@ Page({
   },
 
   onLoad: function(options) {
+    // 检查登录状态
+    if (!app.checkLogin()) {
+      this.setData({ orders: [], loading: false, emptyState: true });
+      return;
+    }
+    
     // 如果有传入状态参数，则使用传入的状态
     if (options && options.status) {
       this.setData({
@@ -27,8 +33,21 @@ Page({
   },
 
   onShow: function() {
+    // 检查登录状态
+    if (!app.checkLogin()) {
+      this.setData({ orders: [], loading: false, emptyState: true });
+      return;
+    }
     // 页面显示时重新加载订单数据
     this.loadOrders();
+  },
+
+  // 下拉刷新
+  onPullDownRefresh: function() {
+    this.loadOrders();
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 500);
   },
 
   // 切换订单状态
@@ -248,9 +267,22 @@ Page({
   // 支付订单
   payOrder: function(e) {
     const orderId = e.currentTarget.dataset.id;
-    wx.showToast({
-      title: '支付功能开发中',
-      icon: 'none'
+    const order = this.data.orders.find(o => o.id === orderId);
+    
+    if (!order) {
+      wx.showToast({
+        title: '订单不存在',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    // 将订单信息设置到全局数据，跳转到支付页面
+    app.globalData.checkoutItems = order.items;
+    app.globalData.currentOrderId = orderId;
+    
+    wx.navigateTo({
+      url: '/pages/checkout/checkout?orderId=' + orderId + '&fromPending=true'
     });
   },
 
@@ -283,9 +315,30 @@ Page({
   // 评价订单
   reviewOrder: function(e) {
     const orderId = e.currentTarget.dataset.id;
-    wx.showToast({
-      title: '评价功能开发中',
-      icon: 'none'
+    wx.showModal({
+      title: '订单评价',
+      content: '请确认是否对该订单进行评价？',
+      confirmText: '去评价',
+      cancelText: '取消',
+      success: res => {
+        if (res.confirm) {
+          // 更新订单状态为已完成
+          let orders = wx.getStorageSync('orders') || [];
+          orders = orders.map(order => {
+            if (order.id === orderId) {
+              return { ...order, status: 'completed', reviewed: true };
+            }
+            return order;
+          });
+          wx.setStorageSync('orders', orders);
+          
+          wx.showToast({
+            title: '评价成功',
+            icon: 'success'
+          });
+          this.loadOrders();
+        }
+      }
     });
   },
 

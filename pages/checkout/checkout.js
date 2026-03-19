@@ -4,23 +4,67 @@ Page({
   data: {
     checkoutItems: [],
     totalPrice: 0,
+    finalPrice: 0,
     selectedAddress: null,
     loading: false,
     selectedPayment: 'wechat', // 默认支付方式为微信支付
     showPasswordModal: false, // 是否显示密码弹窗
     password: '', // 支付密码
     passwordError: '', // 密码错误提示
-    currentOrderId: '' // 当前订单ID
+    currentOrderId: '', // 当前订单ID
+    showCouponModal: false, // 是否显示优惠券弹窗
+    availableCoupons: [], // 可用优惠券列表
+    selectedCoupon: null // 选中的优惠券
   },
 
   onLoad: function(options) {
     // 如果从未支付订单页面跳转过来
     if (options && options.fromUnpaid && options.orderId) {
       this.loadUnpaidOrderData(options.orderId);
+    } else if (options && options.fromPending && options.orderId) {
+      // 从待付款订单跳转过来
+      this.loadPendingOrderData(options.orderId);
     } else {
       this.loadCheckoutData();
     }
     this.loadDefaultAddress();
+  },
+
+  // 加载待付款订单数据
+  loadPendingOrderData: function(orderId) {
+    let orders = wx.getStorageSync('orders') || [];
+    let allOrders = wx.getStorageSync('allOrders') || [];
+    let order = orders.find(o => o.id === orderId);
+    
+    if (!order) {
+      order = allOrders.find(o => o.id === orderId);
+    }
+    
+    if (order) {
+      // 计算总价
+      let totalPrice = 0;
+      order.items.forEach(item => {
+        totalPrice += item.price * item.quantity;
+      });
+      
+      this.setData({
+        checkoutItems: order.items,
+        totalPrice: parseFloat(totalPrice.toFixed(2)),
+        finalPrice: parseFloat(totalPrice.toFixed(2)),
+        selectedAddress: order.address,
+        selectedPayment: order.paymentMethod || 'wechat',
+        currentOrderId: orderId
+      });
+      
+      // 设置到全局数据
+      app.globalData.checkoutItems = order.items;
+      
+      // 加载可用优惠券
+      this.loadAvailableCoupons();
+    } else {
+      // 如果找不到订单，使用默认加载
+      this.loadCheckoutData();
+    }
   },
 
   // 加载未支付订单数据
@@ -64,8 +108,91 @@ Page({
     
     this.setData({
       checkoutItems,
-      totalPrice: parseFloat(totalPrice.toFixed(2))
+      totalPrice: parseFloat(totalPrice.toFixed(2)),
+      finalPrice: parseFloat(totalPrice.toFixed(2))
     });
+    
+    // 加载可用优惠券
+    this.loadAvailableCoupons();
+  },
+
+  // 加载可用优惠券
+  loadAvailableCoupons: function() {
+    const userCoupons = wx.getStorageSync('userCoupons') || [];
+    const totalPrice = this.data.totalPrice;
+    const now = new Date();
+    
+    // 筛选出可用的优惠券
+    const availableCoupons = userCoupons.filter(coupon => {
+      const expireDate = new Date(coupon.expireDate);
+      return !coupon.used && expireDate > now && totalPrice >= coupon.minAmount;
+    });
+    
+    this.setData({
+      availableCoupons: availableCoupons
+    });
+  },
+
+  // 计算最终价格
+  calculateFinalPrice: function() {
+    let finalPrice = this.data.totalPrice;
+    
+    if (this.data.selectedCoupon) {
+      if (this.data.selectedCoupon.type === 'cash') {
+        finalPrice -= this.data.selectedCoupon.amount;
+      } else if (this.data.selectedCoupon.type === 'discount') {
+        finalPrice = finalPrice * (this.data.selectedCoupon.discount / 10);
+      }
+    }
+    
+    // 确保价格不低于0
+    finalPrice = Math.max(0, finalPrice);
+    
+    this.setData({
+      finalPrice: parseFloat(finalPrice.toFixed(2))
+    });
+  },
+
+  // 选择优惠券
+  selectCoupon: function() {
+    if (this.data.availableCoupons.length === 0) {
+      wx.showToast({
+        title: '暂无可用优惠券',
+        icon: 'none'
+      });
+      return;
+    }
+    this.setData({
+      showCouponModal: true
+    });
+  },
+
+  // 关闭优惠券弹窗
+  closeCouponModal: function() {
+    this.setData({
+      showCouponModal: false
+    });
+  },
+
+  // 选择优惠券
+  chooseCoupon: function(e) {
+    const coupon = e.currentTarget.dataset.coupon;
+    if (this.data.selectedCoupon && this.data.selectedCoupon.id === coupon.id) {
+      // 取消选择
+      this.setData({
+        selectedCoupon: null
+      });
+    } else {
+      this.setData({
+        selectedCoupon: coupon
+      });
+    }
+  },
+
+  // 确认优惠券选择
+  confirmCoupon: function() {
+    this.calculateFinalPrice();
+    this.closeCouponModal();
   },
 
   // 加载默认地址

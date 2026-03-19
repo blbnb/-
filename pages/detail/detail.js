@@ -7,7 +7,15 @@ Page({
     bookDetail: null,
     loading: true,
     isFavorited: false,
-    quantity: 1
+    quantity: 1,
+    selectedCondition: 'new',
+    conditionPrices: {
+      new: 0,
+      almost_new: 0,
+      good: 0,
+      fair: 0
+    },
+    currentPrice: 0
   },
 
   onLoad: function(options) {
@@ -1795,8 +1803,40 @@ Page({
       loading: false
     });
     
+    // 计算各成色的价格
+    this.calculateConditionPrices(bookData);
+    
     // 记录浏览历史
     this.recordBrowseHistory(bookData);
+  },
+  
+  // 计算各成色的价格
+  calculateConditionPrices: function(book) {
+    const originalPrice = book.originalPrice || book.price;
+    const conditionPrices = {
+      new: parseFloat(originalPrice.toFixed(2)),
+      almost_new: parseFloat((originalPrice * 0.85).toFixed(2)),
+      good: parseFloat((originalPrice * 0.7).toFixed(2)),
+      fair: parseFloat((originalPrice * 0.5).toFixed(2))
+    };
+    
+    this.setData({
+      conditionPrices: conditionPrices,
+      currentPrice: conditionPrices.new
+    });
+  },
+  
+  // 选择成色
+  selectCondition: function(e) {
+    const condition = e.currentTarget.dataset.condition;
+    const discount = parseFloat(e.currentTarget.dataset.discount);
+    const originalPrice = this.data.bookDetail.originalPrice || this.data.bookDetail.price;
+    const currentPrice = parseFloat((originalPrice * discount).toFixed(2));
+    
+    this.setData({
+      selectedCondition: condition,
+      currentPrice: currentPrice
+    });
   },
   
   // 检查收藏状态
@@ -1918,8 +1958,8 @@ Page({
     let cart = wx.getStorageSync('cart') || [];
     const bookIdNum = parseInt(this.data.bookId, 10);
     
-    // 检查是否已存在
-    const index = cart.findIndex(item => item.bookId === bookIdNum);
+    // 检查是否已存在相同成色的商品
+    const index = cart.findIndex(item => item.bookId === bookIdNum && item.condition === this.data.selectedCondition);
     
     if (index > -1) {
       // 已存在，增加数量
@@ -1931,6 +1971,9 @@ Page({
         bookId: bookIdNum,
         book: this.data.bookDetail,
         quantity: this.data.quantity,
+        condition: this.data.selectedCondition,
+        conditionText: this.getConditionText(this.data.selectedCondition),
+        price: this.data.currentPrice,
         addTime: this.formatDate(new Date()) + ' ' + this.formatTime(new Date())
       });
     }
@@ -1943,6 +1986,17 @@ Page({
       title: '已加入购物车',
       icon: 'success'
     });
+  },
+  
+  // 获取成色文本
+  getConditionText: function(condition) {
+    const conditionMap = {
+      new: '全新',
+      almost_new: '几乎全新',
+      good: '良好',
+      fair: '一般'
+    };
+    return conditionMap[condition] || '未知';
   },
   
   // 立即购买

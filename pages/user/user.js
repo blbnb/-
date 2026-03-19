@@ -26,6 +26,14 @@ Page({
     this.checkLoginStatus();
   },
 
+  // 下拉刷新
+  onPullDownRefresh: function() {
+    this.checkLoginStatus();
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 500);
+  },
+
   // 处理用户头像区域点击事件
   handleAvatarTap: function() {
     if (this.data.isLoggedIn) {
@@ -533,14 +541,6 @@ Page({
     if (!this.checkLogin()) return;
     wx.navigateTo({
       url: '/pages/coupons/coupons'
-    });
-  },
-  
-  // 前往我的积分页面
-  goToPoints: function() {
-    if (!this.checkLogin()) return;
-    wx.navigateTo({
-      url: '/pages/points/points'
     });
   },
 
