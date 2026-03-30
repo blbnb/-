@@ -1,0 +1,83 @@
+<view class="container">
+  <view class="header">
+    <view class="back-btn" bindtap="cancelPublish">
+      <text class="back-icon">←</text>
+      <text class="back-text">取消</text>
+    </view>
+    <view class="title">发布图书</view>
+    <view class="empty"></view>
+  </view>
+
+  <view class="content">
+    <view class="form-group">
+      <view class="label">图书封面</view>
+      <view class="image-upload" bindtap="chooseImage">
+        <image wx:if="{{image}}" class="preview-image" src="{{image}}" mode="aspectFill"></image>
+        <view wx:else class="upload-placeholder">
+          <text class="upload-icon">+</text>
+          <text class="upload-text">点击上传封面</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <view class="label">图书标题 *</view>
+      <input class="input" placeholder="请输入图书标题" value="{{title}}" bindinput="onTitleInput" maxlength="50"></input>
+    </view>
+
+    <view class="form-group">
+      <view class="label">作者 *</view>
+      <input class="input" placeholder="请输入作者" value="{{author}}" bindinput="onAuthorInput" maxlength="30"></input>
+    </view>
+
+    <view class="form-group">
+      <view class="label">原价 *</view>
+      <view class="price-input-wrapper">
+        <text class="currency">¥</text>
+        <input class="price-input" type="digit" placeholder="0.00" value="{{originalPrice}}" bindinput="onOriginalPriceInput"></input>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <view class="label">实际售价</view>
+      <view class="price-display">
+        <text class="currency">¥</text>
+        <text class="price-text">{{price || '0.00'}}</text>
+        <text wx:if="{{condition}}" class="discount-info">({{condition}}，{{Math.round(conditionDiscounts[condition] * 10)}}折)</text>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <view class="label">分类 *</view>
+      <view class="category-selector" bindtap="chooseCategory">
+        <text class="category-text {{category ? '' : 'placeholder'}}">
+          {{category || '请选择分类'}}
+        </text>
+        <text class="arrow">›</text>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <view class="label">新旧程度 *</view>
+      <view class="category-selector" bindtap="chooseCondition">
+        <text class="category-text {{condition ? '' : 'placeholder'}}">
+          {{condition || '请选择新旧程度'}}
+        </text>
+        <text class="arrow">›</text>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <view class="label">图书描述 *</view>
+      <textarea class="textarea" placeholder="请输入图书描述，包括新旧程度、是否有笔记等" value="{{description}}" bindinput="onDescriptionInput" maxlength="500"></textarea>
+      <view class="char-count">{{description.length}}/500</view>
+    </view>
+
+    <view class="button-group">
+      <button class="btn-cancel" bindtap="cancelPublish">取消</button>
+      <button class="btn-publish {{loading ? 'loading' : ''}}" bindtap="publishBook" disabled="{{loading}}">
+        {{loading ? '发布中...' : '立即发布'}}
+      </button>
+    </view>
+  </view>
+</view>

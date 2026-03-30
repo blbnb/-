@@ -3,7 +3,7 @@
   <!-- 用户信息区域 -->
   <view class="user-info-section">
     <view class="user-avatar" bindtap="handleAvatarTap">
-      <image src="{{userInfo && userInfo.avatarUrl ? userInfo.avatarUrl : 'https://picsum.photos/seed/user/200/200'}}" mode="aspectFill"></image>
+      <image src="{{userInfo && userInfo.avatarUrl ? userInfo.avatarUrl : '/Default.jpg'}}" mode="aspectFill"></image>
     </view>
     <view class="user-details" bindtap="handleAvatarTap">
       <text class="user-name">{{userName || '点击登录'}}</text>
@@ -96,6 +96,14 @@
     <view class="menu-item" bindtap="goToPoints">
       <text class="menu-icon">🎯</text>
       <text class="menu-text">我的积分</text>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+  
+  <view class="menu-section">
+    <view class="menu-item" bindtap="goToPublishBook">
+      <text class="menu-icon">➕</text>
+      <text class="menu-text">发表图书</text>
       <text class="menu-arrow">›</text>
     </view>
   </view>

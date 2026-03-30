@@ -161,3 +161,48 @@
 .switch-dot.active {
   transform: translateX(34rpx);
 }
+
+/* 定位按钮样式 */
+.form-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.location-btns {
+  display: flex;
+  gap: 16rpx;
+}
+
+.location-btn {
+  display: flex;
+  align-items: center;
+  background-color: #f0f9ff;
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+  border: 1rpx solid #1890ff;
+}
+
+.location-btn.map-btn {
+  background-color: #f6ffed;
+  border-color: #52c41a;
+}
+
+.location-icon {
+  font-size: 28rpx;
+  margin-right: 6rpx;
+}
+
+.location-text {
+  font-size: 26rpx;
+  color: #1890ff;
+}
+
+.location-btn.map-btn .location-text {
+  color: #52c41a;
+}
+
+.location-btn:active {
+  opacity: 0.7;
+}

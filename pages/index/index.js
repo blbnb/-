@@ -54,48 +54,115 @@ Page({
     this.fetchBooks();
   },
 
-  // 从后端获取图书数据
+  // 获取图书数据（使用本地数据）
   fetchBooks: function () {
     const that = this;
 
     // 显示加载状态
     wx.showLoading({ title: "加载中..." });
 
-    // 调用后端API获取图书数据
-    wx.request({
-      url: `${app.globalData.baseUrl}/book/list`,
-      method: "GET",
-      data: {
-        page: 1,
-        limit: 10,
-      },
-      success: function (res) {
-        console.log("获取图书列表成功", res.data);
-        if (res.data.success && res.data.data && res.data.data.list) {
-          that.setData({
-            recommendBooks: res.data.data.list,
-          });
-        } else {
-          // 如果后端返回数据不符合预期，使用空数组
-          that.setData({
-            recommendBooks: [],
-          });
-          wx.showToast({ title: "暂无图书数据", icon: "none" });
-        }
-      },
-      fail: function (err) {
-        console.error("获取图书列表失败", err);
-        // 网络请求失败时使用空数组
-        that.setData({
-          recommendBooks: [],
-        });
-        wx.showToast({ title: "加载失败，请重试", icon: "none" });
-      },
-      complete: function () {
-        // 隐藏加载状态
-        wx.hideLoading();
-      },
+    // 从本地存储获取图书数据
+    let books = [];
+    
+    // 1. 尝试从本地存储获取
+    const localBooks = wx.getStorageSync('localBooks') || [];
+    const publishedBooks = wx.getStorageSync('publishedBooks') || [];
+    
+    // 合并本地图书和发布的图书
+    books = [...localBooks, ...publishedBooks];
+    
+    // 2. 如果没有本地数据，使用模拟数据
+    if (books.length === 0) {
+      books = this.getMockBooks();
+      // 保存到本地存储
+      wx.setStorageSync('localBooks', books);
+    }
+    
+    // 更新页面数据
+    that.setData({
+      recommendBooks: books.slice(0, 10), // 只显示前10本
     });
+    
+    // 隐藏加载状态
+    wx.hideLoading();
+  },
+
+  // 获取模拟图书数据
+  getMockBooks: function() {
+    return [
+      {
+        id: 1,
+        title: "JavaScript高级程序设计",
+        author: "Matt Frisbie",
+        price: 59.0,
+        originalPrice: 89.0,
+        image: "/Default.jpg",
+        description: '本书是JavaScript领域最有影响力和口碑的著作之一',
+        publisher: "人民邮电出版社",
+        viewCount: 3456,
+        favoriteCount: 892,
+      },
+      {
+        id: 2,
+        title: "数据结构与算法",
+        author: "严蔚敏",
+        price: 45.0,
+        originalPrice: 68.0,
+        image: "/Default.jpg",
+        description: "本书是数据结构领域的经典教材",
+        publisher: "清华大学出版社",
+        viewCount: 2890,
+        favoriteCount: 750,
+      },
+      {
+        id: 101,
+        title: "C语言程序设计",
+        author: "谭浩强",
+        price: 35.0,
+        originalPrice: 45.0,
+        image: "/Default.jpg",
+        description: "本书是C语言领域的经典教材",
+        publisher: "清华大学出版社",
+        viewCount: 5680,
+        favoriteCount: 1280,
+      },
+      {
+        id: 102,
+        title: "高等数学A(上)",
+        author: "同济大学数学系",
+        price: 42.0,
+        originalPrice: 50.0,
+        image: "/Default.jpg",
+        description: "本书是高等数学课程的经典教材",
+        publisher: "高等教育出版社",
+        viewCount: 8920,
+        favoriteCount: 2150,
+      },
+      {
+        id: 201,
+        title: "数据结构",
+        author: "严蔚敏",
+        price: 48.0,
+        originalPrice: 60.0,
+        image: "/Default.jpg",
+        description: "本书系统地介绍了各种数据结构",
+        publisher: "清华大学出版社",
+        viewCount: 4560,
+        favoriteCount: 1080,
+      },
+      {
+        id: 301,
+        title: "计算机网络",
+        author: "谢希仁",
+        price: 48.0,
+        originalPrice: 65.0,
+        image: "/Default.jpg",
+        description: "本书系统地介绍了计算机网络",
+        publisher: "电子工业出版社",
+        viewCount: 4450,
+        favoriteCount: 1120,
+      },
+    ];
   },
 
   onShow: function () {

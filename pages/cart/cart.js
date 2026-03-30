@@ -14,94 +14,56 @@ Page({
     this.loadCartData();
   },
 
-  // 加载购物车数据
+  // 加载购物车数据（使用本地存储）
   loadCartData: function() {
     this.setData({ loading: true });
-    
-    const userInfo = wx.getStorageSync('userInfo');
-    if (userInfo && wx.getStorageSync('token')) {
-      // 从后端加载购物车数据
-      wx.request({
-        url: app.globalData.baseUrl + '/cart/list',
-        method: 'GET',
-        header: {
-          'Authorization': 'Bearer ' + wx.getStorageSync('token')
-        },
-        success: (res) => {
-          console.log('获取购物车数据成功', res.data);
-          if (res.data.success && res.data.data) {
-            const cart = res.data.data.map(item => ({
-              ...item,
-              selected: false
-            }));
-            wx.setStorageSync('cart', cart);
-            this.setData({ cart });
-          } else {
-            // 后端返回数据不符合预期，使用空数组
-            this.setData({ cart: [] });
-            wx.setStorageSync('cart', []);
-          }
-        },
-        fail: (err) => {
-          console.error('获取购物车数据失败', err);
-          // 网络请求失败，使用空数组
-          this.setData({ cart: [] });
-          wx.setStorageSync('cart', []);
-        },
-        complete: () => {
-          this.setData({ loading: false });
-          this.updateCartStatus();
-        }
-      });
-    } else {
-      // 未登录状态，使用空数组
-      this.setData({ cart: [] });
-      this.setData({ loading: false });
-      this.updateCartStatus();
-    }
+    this.loadLocalCartData();
+    this.setData({ loading: false });
+    this.updateCartStatus();
   },
   
   // 加载本地购物车数据
   loadLocalCartData: function() {
     let cart = wx.getStorageSync('cart') || [];
     
-    // 如果没有本地购物车数据，使用模拟数据
-    if (cart.length === 0) {
-      cart = [
-        {
-          id: 'cart1',
-          bookId: '1',
-          title: 'JavaScript高级程序设计',
-          author: 'Matt Frisbie',
-          price: 109.00,
-          image: 'https://picsum.photos/seed/book1/200/280',
-          quantity: 1,
-          selected: false
-        },
-        {
-          id: 'cart2',
-          bookId: '2',
-          title: 'Python编程：从入门到实践',
-          author: 'Eric Matthes',
-          price: 79.00,
-          image: 'https://picsum.photos/seed/book2/200/280',
-          quantity: 2,
-          selected: false
-        },
-        {
-          id: 'cart3',
-          bookId: '3',
-          title: '算法导论',
-          author: 'Thomas H. Cormen',
-          price: 128.00,
-          image: 'https://picsum.photos/seed/book3/200/280',
-          quantity: 1,
-          selected: false
-        }
-      ];
+    // 清理旧格式的购物车数据并确保使用默认图片
+    cart = cart.map(item => {
+      // 如果是旧格式（有 book 对象），转换为新格式
+      if (item.book && !item.title) {
+        return {
+          id: item.id,
+          bookId: item.bookId,
+          title: item.book.title,
+          author: item.book.author,
+          price: item.book.price,
+          image: '/Default.jpg',
+          quantity: item.quantity,
+          selected: item.selected || false
+        };
+      }
+      // 确保新格式数据有 selected 属性且使用默认图片
+      return {
+        selected: false,
+        image: '/Default.jpg',
+        ...item
+      };
+    });
+    
+    // 不自动加载模拟数据，让购物车保持为空
+    // 如果没有本地购物车数据，就为空
+    // if (cart.length === 0) {
+    //   cart = [...]
+    // }
+    
+    // 保存清理后的购物车数据
+    try {
+      wx.setStorageSync('cart', cart);
+    } catch (e) {
+      console.error('保存购物车失败:', e);
+      // 如果保存失败，清空购物车
+      cart = [];
       wx.setStorageSync('cart', cart);
     }
-    
     this.setData({ cart });
   },
 
@@ -145,8 +107,8 @@ Page({
     wx.setStorageSync('cart', cart);
     this.updateCartStatus();
     
-    // 调用后端API更新购物车
-    this.updateRemoteCart();
+    // 调用后端API更新购物车（已禁用）
+    // this.updateRemoteCart();
   },
 
   // 全选/取消全选
@@ -197,8 +159,8 @@ Page({
       wx.setStorageSync('cart', cart);
       this.updateCartStatus();
       
-      // 调用后端API更新购物车
-      this.updateRemoteCart();
+      // 调用后端API更新购物车（已禁用）
+      // this.updateRemoteCart();
     }
   },
 
@@ -221,19 +183,19 @@ Page({
           wx.setStorageSync('cart', cart);
           this.updateCartStatus();
           
-          // 调用后端API删除购物车项
-          const userInfo = wx.getStorageSync('userInfo');
-          if (userInfo && wx.getStorageSync('token')) {
-            const bookId = cart[index].bookId;
-            wx.request({
-              url: app.globalData.baseUrl + '/cart/remove',
-              method: 'POST',
-              data: { bookId },
-              header: {
-                'Authorization': 'Bearer ' + wx.getStorageSync('token')
-              }
-            });
-          }
+          // 调用后端API删除购物车项（已禁用）
+          // const userInfo = wx.getStorageSync('userInfo');
+          // if (userInfo && wx.getStorageSync('token')) {
+          //   const bookId = cart[index].bookId;
+          //   wx.request({
+          //     url: app.globalData.baseUrl + '/cart/remove',
+          //     method: 'POST',
+          //     data: { bookId },
+          //     header: {
+          //       'Authorization': 'Bearer ' + wx.getStorageSync('token')
+          //     }
+          //   });
+          // }
         }
       }
     });
@@ -266,19 +228,19 @@ Page({
     });
   },
   
-  // 更新远程购物车
+  // 更新远程购物车（已禁用）
   updateRemoteCart: function() {
-    const userInfo = wx.getStorageSync('userInfo');
-    if (userInfo && wx.getStorageSync('token')) {
-      wx.request({
-        url: app.globalData.baseUrl + '/cart/update',
-        method: 'POST',
-        data: { cart: this.data.cart },
-        header: {
-          'Authorization': 'Bearer ' + wx.getStorageSync('token')
-        }
-      });
-    }
+    // const userInfo = wx.getStorageSync('userInfo');
+    // if (userInfo && wx.getStorageSync('token')) {
+    //   wx.request({
+    //     url: app.globalData.baseUrl + '/cart/update',
+    //     method: 'POST',
+    //     data: { cart: this.data.cart },
+    //     header: {
+    //       'Authorization': 'Bearer ' + wx.getStorageSync('token')
+    //     }
+    //   });
+    // }
   },
   
   // 前往图书详情

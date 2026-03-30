@@ -57,6 +57,31 @@ Page({
         wx.setStorageSync('orders', allOrders);
       }
       
+      // 处理未支付订单的倒计时
+      allOrders = allOrders.map(order => {
+        if (order.status === 'pending') {
+          const createTime = new Date(order.createTime);
+          const now = new Date();
+          const timeDiff = now - createTime;
+          const countdown = 60000 - timeDiff; // 1分钟倒计时
+          
+          if (countdown <= 0) {
+            // 倒计时结束，订单失效
+            order.status = 'cancelled';
+            order.cancelReason = '超时未支付';
+          } else {
+            order.countdown = Math.ceil(countdown / 1000);
+          }
+        }
+        return order;
+      });
+      
+      // 保存更新后的订单数据
+      wx.setStorageSync('orders', allOrders);
+      
+      // 更新订单统计数据
+      this.updateOrderCounts();
+      
       // 根据当前状态筛选订单
       let filteredOrders = allOrders;
       if (this.data.currentStatus !== 'all') {
@@ -79,6 +104,9 @@ Page({
         emptyState: filteredOrders.length === 0,
         loading: false
       });
+      
+      // 启动倒计时
+      this.startCountdown();
     } catch (e) {
       console.error('加载订单失败:', e);
       this.setData({
@@ -89,6 +117,50 @@ Page({
         title: '加载失败，请重试',
         icon: 'none'
       });
+    }
+  },
+
+  // 启动倒计时
+  startCountdown: function() {
+    // 清除之前的定时器
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
+    }
+    
+    // 启动新的定时器
+    this.countdownTimer = setInterval(() => {
+      let needsUpdateCount = false;
+      const orders = this.data.orders.map(order => {
+        if (order.status === 'pending' && order.countdown > 0) {
+          order.countdown--;
+          
+          // 倒计时结束
+          if (order.countdown <= 0) {
+            order.status = 'cancelled';
+            order.cancelReason = '超时未支付';
+            needsUpdateCount = true;
+            // 保存更新后的订单数据
+            const allOrders = wx.getStorageSync('orders') || [];
+            const updatedOrders = allOrders.map(o => o.id === order.id ? order : o);
+            wx.setStorageSync('orders', updatedOrders);
+          }
+        }
+        return order;
+      });
+      
+      // 如果有订单被取消，更新统计
+      if (needsUpdateCount) {
+        this.updateOrderCounts();
+      }
+      
+      this.setData({ orders });
+    }, 1000);
+  },
+
+  // 页面卸载时清除定时器
+  onUnload: function() {
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
     }
   },
 
@@ -104,7 +176,7 @@ Page({
             title: 'JavaScript高级程序设计',
             price: 109,
             quantity: 1,
-            image: 'https://picsum.photos/seed/book1/200/280'
+            image: '/Default.jpg'
           }
         ],
         totalAmount: 109,
@@ -283,6 +355,35 @@ Page({
       completed: '已完成'
     };
     return statusMap[status] || '未知状态';
+  },
+
+  // 去购物
+  goBack: function() {
+    wx.switchTab({
+      url: '/pages/index/index'
+    });
+  },
+
+  // 更新订单统计数据
+  updateOrderCounts: function() {
+    let orders = wx.getStorageSync('orders') || [];
+    
+    // 统计各状态的订单数量
+    const orderCounts = {
+      pending: 0,
+      paid: 0,
+      shipped: 0,
+      received: 0
+    };
+    
+    orders.forEach(order => {
+      if (orderCounts.hasOwnProperty(order.status)) {
+        orderCounts[order.status]++;
+      }
+    });
+    
+    // 保存到本地存储
+    wx.setStorageSync('orderCounts', orderCounts);
   },
 
 });

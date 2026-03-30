@@ -1,0 +1,129 @@
+<!-- pages/userAgreement/userAgreement.wxml -->
+<view class="container">
+  <view class="header">
+    <text class="title">用户协议</text>
+  </view>
+  
+  <scroll-view 
+    class="agreement-content" 
+    scroll-y="true"
+    bindscroll="onScroll"
+    scroll-with-animation="true"
+    enable-back-to-top="true"
+    style="height: {{scrollHeight}}px;"
+  >
+    <view class="agreement-text">
+      <text class="agreement-title">欢迎使用本图书交易平台</text>
+      
+      <text class="agreement-section-title">1. 协议的接受</text>
+      <text class="agreement-paragraph">
+        欢迎您使用本图书交易平台（以下简称"本平台"）。本协议是您与本平台之间关于使用本平台服务的法律协议。
+        您通过点击"同意"按钮或以其他方式使用本平台服务，即表示您已阅读并同意受本协议约束。
+      </text>
+      
+      <text class="agreement-section-title">2. 平台服务内容</text>
+      <text class="agreement-paragraph">
+        本平台提供图书发布、浏览、搜索、购买、交易等服务。用户可以在本平台上发布二手图书信息，
+        也可以浏览和购买其他用户发布的图书。
+      </text>
+      
+      <text class="agreement-section-title">3. 用户注册与账户管理</text>
+      <text class="agreement-paragraph">
+        用户需要通过微信登录本平台。用户应当提供真实、准确、完整的个人信息，并在信息变更时及时更新。
+        用户应妥善保管账户信息，对使用其账户进行的所有操作负全部责任。
+      </text>
+      
+      <text class="agreement-section-title">4. 用户行为规范</text>
+      <text class="agreement-paragraph">
+        用户在使用本平台服务时，应当遵守法律法规，不得从事以下行为：
+        （1）发布虚假图书信息或误导性信息；
+        （2）发布侵犯他人知识产权的内容；
+        （3）从事欺诈、骚扰或其他违法违规活动；
+        （4）干扰本平台的正常运营。
+      </text>
+      
+      <text class="agreement-section-title">5. 图书交易规则</text>
+      <text class="agreement-paragraph">
+        （1）卖方应当如实描述图书的成色、价格等信息；
+        （2）买方应当仔细阅读图书描述，确认购买意向后再下单；
+        （3）交易完成后，双方应当及时确认收货和付款；
+        （4）如发生交易纠纷，双方应当通过友好协商解决，协商不成的可以寻求平台客服协助。
+      </text>
+      
+      <text class="agreement-section-title">6. 隐私保护</text>
+      <text class="agreement-paragraph">
+        本平台重视用户隐私保护，将按照隐私政策收集、使用和保护用户个人信息。
+        未经用户许可，本平台不会向第三方披露用户个人信息。
+      </text>
+      
+      <text class="agreement-section-title">7. 知识产权</text>
+      <text class="agreement-paragraph">
+        本平台的所有内容，包括但不限于文字、图片、音频、视频等，均受知识产权法律法规保护。
+        用户未经授权不得复制、传播或使用本平台的任何内容。
+      </text>
+      
+      <text class="agreement-section-title">8. 协议的修改</text>
+      <text class="agreement-paragraph">
+        本平台有权根据法律法规的变更或业务发展需要修改本协议。修改后的协议将在平台上公布，
+        用户继续使用本平台服务即表示接受修改后的协议。
+      </text>
+      
+      <text class="agreement-section-title">9. 免责声明</text>
+      <text class="agreement-paragraph">
+        本平台仅作为图书交易的中介服务平台，不参与具体交易过程。
+        对于交易过程中产生的纠纷，本平台不承担赔偿责任，但会提供必要的协助。
+      </text>
+      
+      <text class="agreement-section-title">10. 法律适用与争议解决</text>
+      <text class="agreement-paragraph">
+        本协议的订立、履行、解释及争议解决均适用中华人民共和国法律。
+        如发生争议，双方应协商解决；协商不成的，任何一方均有权向有管辖权的人民法院提起诉讼。
+      </text>
+      
+      <text class="agreement-section-title">11. 其他条款</text>
+      <text class="agreement-paragraph">
+        本协议构成双方关于本协议项下事项的完整协议，取代此前的所有口头或书面约定。
+        如本协议的任何条款被认定为无效或不可执行，不影响其他条款的效力。
+      </text>
+      
+      <view class="bottom-marker">
+        <text class="bottom-text">已经阅读完毕</text>
+      </view>
+    </view>
+  </scroll-view>
+  
+  <view class="footer">
+    <view class="countdown" wx:if="{{countdown > 0}}">
+      <text>请阅读协议内容（{{countdown}}s）</text>
+    </view>
+    <view class="countdown" wx:else>
+      <text>可以同意协议</text>
+    </view>
+    
+    <view class="agreement-checkbox">
+      <checkbox-group bindchange="handleAgreeChange">
+        <label class="checkbox-label">
+          <checkbox value="agree" checked="{{isAgreed}}" />
+          <text>我已阅读并同意《用户协议》</text>
+        </label>
+      </checkbox-group>
+    </view>
+    
+    <view class="buttons">
+      <button 
+        class="disagree-btn"
+        bindtap="disagree"
+      >
+        不同意
+      </button>
+      <button 
+        class="agree-btn"
+        bindtap="agreeAndLogin"
+        disabled="{{!canAgree}}"
+        style="background-color: {{canAgree ? '#07c160' : '#ccc'}};"
+      >
+        同意协议并登录
+      </button>
+    </view>
+  </view>
+</view>

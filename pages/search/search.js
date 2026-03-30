@@ -290,7 +290,12 @@ Page({
         const semesters = grades[grade];
         for (const semester in semesters) {
           const books = semesters[semester];
-          allBooks = allBooks.concat(books);
+          // 替换所有图片为默认图片
+          const booksWithDefaultImage = books.map(book => ({
+            ...book,
+            image: '/Default.jpg'
+          }));
+          allBooks = allBooks.concat(booksWithDefaultImage);
         }
       }
     }
@@ -298,22 +303,30 @@ Page({
     return allBooks;
   },
   
-  // 执行搜索
+  // 执行搜索（使用本地存储）
   performSearch: function(keyword) {
     this.setData({ loading: true, noResults: false });
     
-    // 获取所有学院的专业书籍数据
-    const allBooks = this.getAllCollegeBooks();
+    // 从本地存储获取所有图书
+    let allBooks = [];
+    const localBooks = wx.getStorageSync('localBooks') || [];
+    const publishedBooks = wx.getStorageSync('publishedBooks') || [];
+    allBooks = [...localBooks, ...publishedBooks];
+    
+    // 如果没有本地数据，使用模拟数据
+    if (allBooks.length === 0) {
+      allBooks = this.getAllCollegeBooks();
+    }
     
     // 模拟搜索延迟
     setTimeout(() => {
-      // 过滤包含关键词的图书，只返回专业书籍
+      // 过滤包含关键词的图书
       const results = allBooks.filter(book => 
-        (book.tags && book.tags.includes('专业')) && // 只包含专业书籍
-        (book.title.includes(keyword) || 
-         book.author.includes(keyword) ||
-         (book.tags && book.tags.some(tag => tag.includes(keyword))) ||
-         (book.college && book.college.includes(keyword)))
+        (book.title && book.title.includes(keyword)) || 
+        (book.author && book.author.includes(keyword)) ||
+        (book.tags && book.tags.some(tag => tag.includes(keyword))) ||
+        (book.college && book.college.includes(keyword)) ||
+        (book.category && book.category.includes(keyword))
       );
       
       this.setData({

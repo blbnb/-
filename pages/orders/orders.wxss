@@ -111,6 +111,12 @@
   font-weight: 600;
 }
 
+.countdown {
+  color: #ff4757;
+  font-weight: 600;
+  font-size: 26rpx;
+}
+
 /* 订单收货地址 */
 .order-address {
   padding: 20rpx 0;

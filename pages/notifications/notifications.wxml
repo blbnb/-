@@ -59,7 +59,7 @@
     <!-- 空状态 -->
     <block wx:if="{{!loading && emptyState}}">
       <view class="empty-state">
-        <image src="../../assets/images/empty-notification.svg" mode="aspectFit"></image>
+        <image src="/Default.jpg" mode="aspectFit"></image>
         <text class="empty-text">暂无通知</text>
       </view>
     </block>

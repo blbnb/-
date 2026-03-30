@@ -2,7 +2,8 @@
 Page({
   data: {
     phoneNumber: '',
-    email: ''
+    email: '',
+    wechatId: ''
   },
 
   onLoad: function() {
@@ -14,7 +15,8 @@ Page({
     const userInfo = wx.getStorageSync('userInfo') || {};
     this.setData({
       phoneNumber: userInfo.phone || '未绑定',
-      email: userInfo.email || '未绑定'
+      email: userInfo.email || '未绑定',
+      wechatId: userInfo.wechatId || '未绑定'
     });
   },
 
@@ -44,6 +46,25 @@ Page({
   bindEmail: function() {
     wx.navigateTo({
       url: '/pages/settings/bindEmail'
+    });
+  },
+
+  // 绑定微信号
+  bindWechat: function() {
+    wx.showModal({
+      title: '绑定微信号',
+      content: '将使用当前登录的微信账号进行绑定',
+      success: (res) => {
+        if (res.confirm) {
+          // 模拟绑定微信号
+          const userInfo = wx.getStorageSync('userInfo') || {};
+          const wechatId = 'wx_' + Date.now().toString().substr(-8);
+          userInfo.wechatId = wechatId;
+          wx.setStorageSync('userInfo', userInfo);
+          this.setData({ wechatId: wechatId });
+          wx.showToast({ title: '绑定成功', icon: 'success' });
+        }
+      }
     });
   },
 

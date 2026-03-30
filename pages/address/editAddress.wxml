@@ -54,10 +54,22 @@
 
     <!-- 详细地址 -->
     <view class="form-item">
-      <view class="form-label">详细地址</view>
+      <view class="form-label">
+        <text>详细地址</text>
+        <view class="location-btns">
+          <view class="location-btn" bindtap="chooseLocation">
+            <text class="location-icon">📍</text>
+            <text class="location-text">定位</text>
+          </view>
+          <view class="location-btn map-btn" bindtap="openMapSelect">
+            <text class="location-icon">🗺️</text>
+            <text class="location-text">选点</text>
+          </view>
+        </view>
+      </view>
       <textarea 
         class="form-textarea" 
-        placeholder="请输入详细地址信息" 
+        placeholder="请输入详细地址信息，或点击上方按钮自动定位" 
         value="{{detail}}"
         data-field="detail"
         bindinput="onInputChange"

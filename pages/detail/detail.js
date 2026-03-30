@@ -27,36 +27,46 @@ Page({
     // 显示加载状态
     wx.showLoading({ title: "加载中..." });
 
-    // 调用后端API获取图书详情
-    wx.request({
-      url: `${app.globalData.baseUrl}/book/detail/${this.data.bookId}`,
-      method: "GET",
-      success: function (res) {
-        console.log("获取图书详情成功", res.data);
-        if (res.data.success && res.data.data) {
-          that.setData({
-            bookDetail: res.data.data,
-          });
-          // 记录浏览历史
-          that.recordBrowseHistory(res.data.data);
-        } else {
-          // 如果后端返回数据不符合预期，显示错误信息
-          wx.showToast({ title: "获取图书详情失败", icon: "none" });
-        }
-      },
-      fail: function (err) {
-        console.error("获取图书详情失败", err);
-        // 网络请求失败时显示错误信息
-        wx.showToast({ title: "加载失败，请重试", icon: "none" });
-      },
-      complete: function () {
-        that.setData({
-          loading: false,
-        });
-        // 隐藏加载状态
-        wx.hideLoading();
-      },
-    });
+    // 先从本地存储获取图书数据
+    let bookDetail = null;
+    
+    // 1. 尝试从本地存储的图书列表中获取
+    const localBooks = wx.getStorageSync('localBooks') || [];
+    bookDetail = localBooks.find(book => book.id == this.data.bookId);
+    
+    // 2. 如果没有找到，尝试从发布的图书中获取
+    if (!bookDetail) {
+      const publishedBooks = wx.getStorageSync('publishedBooks') || [];
+      bookDetail = publishedBooks.find(book => book.id == this.data.bookId);
+    }
+    
+    // 3. 如果还是没有找到，使用模拟数据
+    if (!bookDetail) {
+      const mockBooks = this.getMockBooksData();
+      bookDetail = mockBooks.find(book => book.id == this.data.bookId);
+    }
+    
+    if (bookDetail) {
+      that.setData({
+        bookDetail: bookDetail,
+        loading: false
+      });
+      // 记录浏览历史
+      that.recordBrowseHistory(bookDetail);
+      wx.hideLoading();
+    } else {
+      // 如果都没找到，显示错误信息
+      that.setData({
+        loading: false
+      });
+      wx.hideLoading();
+      wx.showToast({ title: "图书不存在", icon: "none" });
+    }
+  },
+
+  // 获取模拟图书数据
+  getMockBooksData: function() {
+    return this.useMockData();
   },
 
   // 使用模拟数据
@@ -1867,6 +1877,16 @@ Page({
     // 将bookId转换为数字类型进行比较
     const bookIdNum = parseInt(this.data.bookId, 10);
 
+    // 返回模拟图书数据库
+    return mockBooksDatabase;
+  },
+
+  // 使用模拟数据（旧方法，用于兼容）
+  useMockDataOld: function () {
+    // 将bookId转换为数字类型进行比较
+    const bookIdNum = parseInt(this.data.bookId, 10);
+    const mockBooksDatabase = this.useMockData();
+
     // 查找对应的图书数据
     let bookData = mockBooksDatabase.find((book) => book.id === bookIdNum);
 
@@ -2023,27 +2043,37 @@ Page({
     // 获取购物车数据
     let cart = wx.getStorageSync("cart") || [];
     const bookIdNum = parseInt(this.data.bookId, 10);
+    const bookDetail = this.data.bookDetail;
 
     // 检查是否已存在
-    const index = cart.findIndex((item) => item.bookId === bookIdNum);
+    const index = cart.findIndex((item) => item.bookId == bookIdNum);
 
     if (index > -1) {
       // 已存在，增加数量
       cart[index].quantity += this.data.quantity;
     } else {
-      // 不存在，添加新项
+      // 不存在，添加新项（只使用默认图片，避免大图片）
       cart.push({
         id: "c" + Date.now(),
         bookId: bookIdNum,
-        book: this.data.bookDetail,
+        title: bookDetail.title,
+        author: bookDetail.author,
+        price: bookDetail.price,
+        image: '/Default.jpg',
         quantity: this.data.quantity,
-        addTime:
-          this.formatDate(new Date()) + " " + this.formatTime(new Date()),
+        selected: false
       });
     }
 
     // 保存购物车数据
-    wx.setStorageSync("cart", cart);
+    try {
+      wx.setStorageSync("cart", cart);
+    } catch (e) {
+      console.error('保存购物车失败:', e);
+      // 如果保存失败，清理旧数据重试
+      this.cleanupStorage();
+      wx.setStorageSync("cart", cart);
+    }
 
     // 显示成功提示
     wx.showToast({
@@ -2092,5 +2122,46 @@ Page({
   // 返回上一页
   goBack: function () {
     wx.navigateBack();
+  },
+
+  // 清理存储空间
+  cleanupStorage: function() {
+    console.log('开始清理存储空间...');
+    try {
+      // 清理购物车中的大图片
+      let cart = wx.getStorageSync('cart') || [];
+      cart = cart.map(item => ({
+        ...item,
+        image: '/Default.jpg'
+      }));
+      wx.setStorageSync('cart', cart);
+
+      // 清理发布图书中的大图片
+      let publishedBooks = wx.getStorageSync('publishedBooks') || [];
+      publishedBooks = publishedBooks.map(book => ({
+        ...book,
+        image: '/Default.jpg'
+      }));
+      wx.setStorageSync('publishedBooks', publishedBooks);
+
+      // 清理本地图书中的大图片
+      let localBooks = wx.getStorageSync('localBooks') || [];
+      localBooks = localBooks.map(book => ({
+        ...book,
+        image: '/Default.jpg'
+      }));
+      wx.setStorageSync('localBooks', localBooks);
+
+      // 清理浏览历史
+      wx.removeStorageSync('browseHistory');
+
+      console.log('存储空间清理完成');
+      wx.showToast({
+        title: '已清理存储空间',
+        icon: 'success'
+      });
+    } catch (e) {
+      console.error('清理存储失败:', e);
+    }
   },
 });

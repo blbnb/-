@@ -23,7 +23,7 @@ Page({
     this.loadFavorites();
   },
 
-  // 加载收藏的图书
+  // 加载收藏的图书（使用本地存储）
   loadFavorites: function() {
     const userInfo = wx.getStorageSync('userInfo');
     if (!userInfo) {
@@ -37,38 +37,19 @@ Page({
 
     this.setData({ loading: true });
 
-    // 调用后端API获取收藏列表
-    wx.request({
-      url: app.globalData.baseUrl + '/favorite/list',
-      method: 'GET',
-      data: {
-        page: this.data.page,
-        pageSize: this.data.pageSize
-      },
-      header: {
-        'Authorization': 'Bearer ' + wx.getStorageSync('token')
-      },
-      success: (res) => {
-        if (res.data.success) {
-          const newFavorites = res.data.data.list || [];
-          const updatedFavorites = this.data.page === 1 ? newFavorites : [...this.data.favorites, ...newFavorites];
-          
-          this.setData({
-            favorites: updatedFavorites,
-            hasMore: newFavorites.length >= this.data.pageSize,
-            page: this.data.page + 1,
-            loading: false
-          });
-        } else {
-          // 使用模拟数据
-          this.loadMockFavorites();
-        }
-      },
-      fail: () => {
-        // 使用模拟数据
-        this.loadMockFavorites();
-      }
-    });
+    // 从本地存储获取收藏数据
+    let favorites = wx.getStorageSync('favorites') || [];
+    
+    // 如果没有本地数据，使用模拟数据
+    if (favorites.length === 0) {
+      this.loadMockFavorites();
+    } else {
+      this.setData({
+        favorites: favorites,
+        loading: false,
+        hasMore: false
+      });
+    }
   },
 
   // 加载模拟收藏数据
@@ -81,7 +62,7 @@ Page({
           title: '深入理解计算机系统',
           author: 'Randal E. Bryant',
           price: 58.00,
-          image: 'https://picsum.photos/seed/book101/200/280',
+          image: '/Default.jpg',
           publisher: '机械工业出版社',
           publishDate: '2016-03-01',
           viewCount: 234
@@ -95,7 +76,7 @@ Page({
           title: 'Python编程：从入门到实践',
           author: 'Eric Matthes',
           price: 42.50,
-          image: 'https://picsum.photos/seed/book102/200/280',
+          image: '/Default.jpg',
           publisher: '人民邮电出版社',
           publishDate: '2016-07-01',
           viewCount: 456
@@ -109,7 +90,7 @@ Page({
           title: '数据结构与算法分析',
           author: 'Mark Allen Weiss',
           price: 48.00,
-          image: 'https://picsum.photos/seed/book103/200/280',
+          image: '/Default.jpg',
           publisher: '电子工业出版社',
           publishDate: '2014-08-01',
           viewCount: 189
@@ -123,7 +104,7 @@ Page({
           title: '编译原理',
           author: 'Alfred V. Aho',
           price: 55.00,
-          image: 'https://picsum.photos/seed/book104/200/280',
+          image: '/Default.jpg',
           publisher: '机械工业出版社',
           publishDate: '2011-08-01',
           viewCount: 156
@@ -132,6 +113,9 @@ Page({
       }
     ];
 
+    // 保存到本地存储
+    wx.setStorageSync('favorites', mockFavorites);
+    
     this.setData({
       favorites: mockFavorites,
       loading: false,
@@ -149,7 +133,6 @@ Page({
 
   // 取消收藏
   removeFromFavorites: function(e) {
-    const favoriteId = e.currentTarget.dataset.favId;
     const index = e.currentTarget.dataset.index;
     
     wx.showModal({
@@ -157,47 +140,18 @@ Page({
       content: '确定要取消收藏这本图书吗？',
       success: (res) => {
         if (res.confirm) {
-          // 调用后端API取消收藏
-          wx.request({
-            url: app.globalData.baseUrl + '/favorite/remove',
-            method: 'POST',
-            data: {
-              id: favoriteId
-            },
-            header: {
-              'Authorization': 'Bearer ' + wx.getStorageSync('token')
-            },
-            success: (response) => {
-              if (response.data.success || true) { // 模拟成功
-                // 更新本地数据
-                const updatedFavorites = this.data.favorites.filter((item, i) => i !== index);
-                this.setData({
-                  favorites: updatedFavorites
-                });
-                
-                wx.showToast({
-                  title: '取消收藏成功',
-                  icon: 'success'
-                });
-              } else {
-                wx.showToast({
-                  title: response.data.message || '操作失败',
-                  icon: 'none'
-                });
-              }
-            },
-            fail: () => {
-              // 本地删除
-              const updatedFavorites = this.data.favorites.filter((item, i) => i !== index);
-              this.setData({
-                favorites: updatedFavorites
-              });
-              
-              wx.showToast({
-                title: '取消收藏成功',
-                icon: 'success'
-              });
-            }
+          // 本地删除
+          const updatedFavorites = this.data.favorites.filter((item, i) => i !== index);
+          this.setData({
+            favorites: updatedFavorites
+          });
+          
+          // 更新本地存储
+          wx.setStorageSync('favorites', updatedFavorites);
+          
+          wx.showToast({
+            title: '取消收藏成功',
+            icon: 'success'
           });
         }
       }

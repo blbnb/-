@@ -30,6 +30,17 @@
       </view>
     </view>
     
+    <view class="setting-item" bindtap="bindWechat">
+      <view class="setting-left">
+        <text class="setting-icon">💬</text>
+        <text class="setting-text">绑定微信号</text>
+      </view>
+      <view class="setting-right">
+        <text class="setting-value">{{wechatId}}</text>
+        <text class="setting-arrow">›</text>
+      </view>
+    </view>
+    
     <view class="setting-item" bindtap="bindEmail">
       <view class="setting-left">
         <text class="setting-icon">✉️</text>

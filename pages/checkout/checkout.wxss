@@ -141,6 +141,38 @@
   color: #999;
 }
 
+/* 优惠券选择部分 */
+.coupon-section {
+  background-color: #fff;
+  margin: 20rpx 0;
+  padding: 24rpx 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.coupon-content {
+  flex: 1;
+}
+
+.coupon-label {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-right: 20rpx;
+  color: #333;
+}
+
+.coupon-value {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.coupon-arrow {
+  font-size: 40rpx;
+  color: #999;
+  margin-left: 20rpx;
+}
+
 /* 价格信息部分 */
 .price-section {
   background-color: #fff;
@@ -163,6 +195,11 @@
 .price-value {
   font-size: 28rpx;
   color: #333;
+}
+
+.price-value.discount {
+  color: #ff4757;
+  font-weight: bold;
 }
 
 .price-item.total {

@@ -182,5 +182,167 @@ Page({
     return true;
   },
 
+  // 高德地图定位功能
+  chooseLocation: function() {
+    const that = this;
+    
+    // 获取用户当前位置
+    wx.getLocation({
+      type: 'gcj02',
+      success: function(res) {
+        const latitude = res.latitude;
+        const longitude = res.longitude;
+        
+        // 调用高德地图逆地理编码API
+        that.reverseGeocoding(latitude, longitude);
+      },
+      fail: function(err) {
+        wx.showToast({
+          title: '定位失败，请检查定位权限',
+          icon: 'none'
+        });
+        console.error('定位失败:', err);
+      }
+    });
+  },
+
+  // 高德地图逆地理编码
+  reverseGeocoding: function(latitude, longitude) {
+    const that = this;
+    const amapKey = '61c572ad898963693bda9f57404a683d'; // 请替换为您的高德地图Key
+    
+    wx.request({
+      url: `https://restapi.amap.com/v3/geocode/regeo`,
+      data: {
+        key: amapKey,
+        location: `${longitude},${latitude}`,
+        extensions: 'all',
+        radius: 1000
+      },
+      success: function(res) {
+        if (res.data.status === '1' && res.data.regeocode) {
+          const addressComponent = res.data.regeocode.addressComponent;
+          const formattedAddress = res.data.regeocode.formatted_address;
+          
+          // 提取省市区信息
+          const province = addressComponent.province || '';
+          const city = addressComponent.city || addressComponent.province || '';
+          const district = addressComponent.district || '';
+          
+          // 提取详细地址（去除省市区部分）
+          let detail = formattedAddress;
+          if (province) detail = detail.replace(province, '');
+          if (city && city !== province) detail = detail.replace(city, '');
+          if (district) detail = detail.replace(district, '');
+          detail = detail.replace(/^\s*/, '');
+          
+          // 更新页面数据
+          that.setData({
+            province: province,
+            city: city,
+            district: district,
+            detail: detail,
+            region: [province, city, district]
+          });
+          
+          wx.showToast({
+            title: '定位成功',
+            icon: 'success'
+          });
+        } else {
+          wx.showToast({
+            title: '地址解析失败',
+            icon: 'none'
+          });
+        }
+      },
+      fail: function(err) {
+        wx.showToast({
+          title: '网络请求失败',
+          icon: 'none'
+        });
+        console.error('逆地理编码失败:', err);
+      }
+    });
+  },
+
+  // 使用地图选点功能
+  openMapSelect: function() {
+    const that = this;
+    
+    wx.chooseLocation({
+      success: function(res) {
+        const latitude = res.latitude;
+        const longitude = res.longitude;
+        const name = res.name || '';
+        const address = res.address || '';
+        
+        // 调用高德地图逆地理编码获取详细地址信息
+        that.reverseGeocodingWithAddress(latitude, longitude, name, address);
+      },
+      fail: function(err) {
+        if (err.errMsg !== 'chooseLocation:fail cancel') {
+          wx.showToast({
+            title: '选择位置失败',
+            icon: 'none'
+          });
+        }
+      }
+    });
+  },
+
+  // 根据地图选点结果解析地址
+  reverseGeocodingWithAddress: function(latitude, longitude, name, address) {
+    const that = this;
+    const amapKey = 'YOUR_AMAP_KEY'; // 请替换为您的高德地图Key
+    
+    wx.request({
+      url: `https://restapi.amap.com/v3/geocode/regeo`,
+      data: {
+        key: amapKey,
+        location: `${longitude},${latitude}`,
+        extensions: 'all',
+        radius: 1000
+      },
+      success: function(res) {
+        if (res.data.status === '1' && res.data.regeocode) {
+          const addressComponent = res.data.regeocode.addressComponent;
+          
+          // 提取省市区信息
+          const province = addressComponent.province || '';
+          const city = addressComponent.city || addressComponent.province || '';
+          const district = addressComponent.district || '';
+          
+          // 使用地图返回的详细地址
+          const detail = name ? `${name}(${address})` : address;
+          
+          // 更新页面数据
+          that.setData({
+            province: province,
+            city: city,
+            district: district,
+            detail: detail,
+            region: [province, city, district]
+          });
+          
+          wx.showToast({
+            title: '位置选择成功',
+            icon: 'success'
+          });
+        } else {
+          // 如果解析失败，直接使用地图返回的地址
+          that.setData({
+            detail: name ? `${name}(${address})` : address
+          });
+        }
+      },
+      fail: function() {
+        // 如果请求失败，直接使用地图返回的地址
+        that.setData({
+          detail: name ? `${name}(${address})` : address
+        });
+      }
+    });
+  }
 
 });

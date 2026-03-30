@@ -46,7 +46,7 @@ Page({
         const completeUserInfo = {
           id: userInfo.id || Date.now().toString(),
           nickName: userInfo.nickName || userInfo.nickname || '微信用户',
-          avatarUrl: userInfo.avatarUrl || 'https://picsum.photos/seed/user/200/200',
+          avatarUrl: userInfo.avatarUrl || '/Default.jpg',
           ...userInfo
         };
         
@@ -57,12 +57,8 @@ Page({
           historyCount: 0
         };
         
-        const orderCounts = wx.getStorageSync('orderCounts') || {
-          pending: 0,
-          paid: 0,
-          shipped: 0,
-          received: 0
-        };
+        // 从实际订单同步统计数据
+        this.loadOrderCounts();
         
         const notificationCount = wx.getStorageSync('notificationCount') || 0;
         
@@ -73,7 +69,6 @@ Page({
           userName: completeUserInfo.nickName,
           userID: 'ID: ' + completeUserInfo.id,
           userStats: userStats,
-          orderCounts: orderCounts,
           notificationCount: notificationCount
         });
         
@@ -132,13 +127,25 @@ Page({
   
   // 加载订单数量统计
   loadOrderCounts: function() {
-    // 模拟加载订单数量
-    const orderCounts = wx.getStorageSync('orderCounts') || {
-      pending: 1,
-      paid: 2,
-      shipped: 1,
-      received: 3
+    // 从实际订单数据中统计各状态的数量
+    let orders = wx.getStorageSync('orders') || [];
+    
+    // 统计各状态的订单数量
+    const orderCounts = {
+      pending: 0,
+      paid: 0,
+      shipped: 0,
+      received: 0
     };
+    
+    orders.forEach(order => {
+      if (orderCounts.hasOwnProperty(order.status)) {
+        orderCounts[order.status]++;
+      }
+    });
+    
+    // 保存到本地存储
+    wx.setStorageSync('orderCounts', orderCounts);
     
     this.setData({
       orderCounts: orderCounts
@@ -170,67 +177,48 @@ Page({
 
   // 登录 - 使用微信登录
   login: function() {
-    wx.showLoading({ title: '登录中...' });
-    
-    wx.login({
-      success: res => {
-        if (res.code) {
-          // 保存登录凭证
-          const loginCode = res.code;
-          
-          // 使用最新的获取用户信息方式
-          wx.getUserInfo({
-            withCredentials: true,
-            success: (userRes) => {
-              // 保存用户基本信息
-              const userInfo = userRes.userInfo;
-              
-              // 尝试直接登录，不强制要求手机号
-              this.completeLogin(loginCode, userInfo, null);
-            },
-            fail: (err) => {
-              console.error('获取用户信息失败:', err);
-              // 即使授权失败，也尝试使用默认信息进行本地登录
-              const defaultUserInfo = {
-                nickName: '微信用户',
-                avatarUrl: 'https://picsum.photos/seed/user/200/200'
-              };
-              this.handleLocalLogin(defaultUserInfo, null);
-              wx.hideLoading();
-            }
-          });
-        } else {
-          console.error('登录失败:', res);
-          // 创建默认用户信息进行本地登录
-          const defaultUserInfo = {
-            nickName: '微信用户',
-            avatarUrl: 'https://picsum.photos/seed/user/200/200'
-          };
-          this.handleLocalLogin(defaultUserInfo, null);
-          wx.hideLoading();
+    console.log('登录函数被调用');
+    // 直接开始登录，跳过用户协议（用于测试）
+    this.startLoginProcess();
+  },
+
+  // 显示用户协议弹窗
+  showUserAgreement: function() {
+    console.log('显示用户协议弹窗');
+    wx.showModal({
+      title: '用户协议',
+      content: '欢迎使用校园图书小程序！\n\n在您登录前，请仔细阅读以下协议：\n\n1. 您必须遵守国家法律法规\n2. 不得发布违法违规内容\n3. 尊重他人知识产权\n4. 保护个人隐私信息\n5. 合理使用平台功能\n\n请您务必阅读并理解本协议的全部内容。',
+      showCancel: true,
+      cancelText: '暂不登录',
+      confirmText: '我已阅读并同意',
+      success: (res) => {
+        console.log('用户协议弹窗结果:', res);
+        if (res.confirm) {
+          // 开始登录流程
+          this.startLoginProcess();
         }
-      },
-      fail: (err) => {
-        console.error('登录失败:', err);
-        // 网络异常时也使用本地登录
-        const defaultUserInfo = {
-          nickName: '微信用户',
-          avatarUrl: 'https://picsum.photos/seed/user/200/200'
-        };
-        this.handleLocalLogin(defaultUserInfo, null);
-        wx.hideLoading();
-      },
-      complete: () => {
-        // 移除默认的hideLoading，因为在各个分支已经处理
       }
     });
+  },
+
+  // 开始登录流程
+  startLoginProcess: function() {
+    console.log('开始登录流程');
+    wx.showLoading({ title: '登录中...' });
+    
+    // 直接使用本地登录，跳过已废弃的微信API
+    const defaultUserInfo = {
+      nickName: '微信用户',
+      avatarUrl: '/Default.jpg'
+    };
+    this.handleLocalLogin(defaultUserInfo, null);
   },
   
   // 完成登录流程
   completeLogin: function(loginCode, userInfo, phoneData) {
     console.log('开始完成登录流程', {loginCode, userInfo, phoneData});
     
-    if (!loginCode || !userInfo) {
+    if (!userInfo) {
       wx.showToast({ title: '登录失败，请重试', icon: 'none' });
       return;
     }
@@ -238,73 +226,8 @@ Page({
     // 显示加载提示
     wx.showLoading({ title: '登录中...' });
     
-    // 调用后端API进行登录
-    wx.request({
-      url: app.globalData.baseUrl + '/login',
-      method: 'POST',
-      data: {
-        code: loginCode,
-        userInfo: userInfo,
-        phoneData: phoneData
-      },
-      success: (response) => {
-        console.log('登录请求返回:', response);
-        
-        try {
-          if (response.statusCode === 200 && response.data) {
-            // 处理可能的不同响应格式
-            const userData = response.data.data || response.data.userInfo || response.data;
-            const token = response.data.token || null;
-            
-            if (userData) {
-              // 保存用户信息
-              wx.setStorageSync('userInfo', userData);
-              if (token) {
-                wx.setStorageSync('token', token);
-              }
-              
-              app.globalData.userInfo = userData;
-              app.globalData.isLogin = true;
-              
-              this.setData({
-                isLoggedIn: true,
-                isLogin: true,
-                userInfo: userData,
-                userName: userData.nickName || userData.nickname || '用户' + (userData.id ? userData.id.toString().substring(0, 8) : ''),
-                userID: 'ID: ' + (userData.id || 'local')
-              });
-              
-              // 加载用户统计数据
-              this.loadUserStats();
-              this.loadOrderCounts();
-              this.loadNotificationCount();
-              
-              wx.showToast({
-                title: '登录成功',
-                icon: 'success'
-              });
-            } else {
-              console.error('登录数据异常:', response.data);
-              wx.showToast({ title: '登录失败，请重试', icon: 'none' });
-            }
-          } else {
-            console.error('登录失败，状态码:', response.statusCode);
-            wx.showToast({ title: '登录失败，请重试', icon: 'none' });
-          }
-        } catch (e) {
-          console.error('处理登录响应时出错:', e);
-          wx.showToast({ title: '登录失败，请重试', icon: 'none' });
-        }
-      },
-      fail: (err) => {
-        console.error('登录请求网络失败:', err);
-        wx.showToast({ title: '网络错误，请重试', icon: 'none' });
-      },
-      complete: () => {
-        // 隐藏加载提示
-        wx.hideLoading();
-      }
-    });
+    // 直接使用本地登录，避免后端API调用
+    this.handleLocalLogin(userInfo, phoneData);
   },
   
   // 处理本地登录（当后端接口不可用时的备用方案）
@@ -316,7 +239,7 @@ Page({
       const localUserInfo = {
         id: Date.now().toString(),
         nickName: userInfo.nickName || '微信用户',
-        avatarUrl: userInfo.avatarUrl || 'https://picsum.photos/seed/user/200/200',
+        avatarUrl: userInfo.avatarUrl || '/Default.jpg',
         phone: phoneData ? '已获取' : '未绑定',
         college: '未设置',
         level: '普通会员',
@@ -369,9 +292,11 @@ Page({
     } catch (e) {
       console.error('本地登录失败:', e);
       wx.showToast({
-        title: '登录成功',
-        icon: 'success'
+        title: '登录失败，请重试',
+        icon: 'none'
       });
+    } finally {
+      wx.hideLoading();
     }
   },
 
@@ -526,15 +451,35 @@ Page({
     });
   },
 
+  // 前往发表图书页面
+  goToPublishBook: function() {
+    console.log('goToPublishBook 被调用');
+    console.log('当前登录状态:', this.data.isLoggedIn);
+    if (!this.checkLogin()) {
+      console.log('未登录，返回');
+      return;
+    }
+    console.log('已登录，跳转到发布页面');
+    wx.navigateTo({
+      url: '/pages/publishBook/publishBook'
+    });
+  },
+
   // 检查是否登录的统一辅助函数 - 确保整个页面只有一个回退逻辑
   checkLogin: function() {
-    if (!this.data.isLoggedIn) {
+    console.log('checkLogin 被调用，当前状态:', this.data.isLoggedIn);
+    
+    // 双重检查：既检查 data.isLoggedIn，也检查本地存储
+    const userInfo = wx.getStorageSync('userInfo');
+    if (!this.data.isLoggedIn || !userInfo) {
+      console.log('检查结果：未登录');
       wx.showToast({
         title: '请先登录',
         icon: 'none'
       });
       return false;
     }
+    console.log('检查结果：已登录');
     return true;
   }
 })

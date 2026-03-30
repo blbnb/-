@@ -1,4 +1,5 @@
 // pages/category/category.js
+const app = getApp();
 Page({
   data: {
     categoryName: '',
@@ -57,132 +58,97 @@ Page({
     this.updateCurrentData();
   },
 
-  // 加载年级课程数据
+  // 加载年级课程数据（使用本地数据）
   loadGradeBooks: function(category) {
     const that = this;
     
     // 显示加载状态
     wx.showLoading({ title: '加载中...' });
     
-    // 调用后端API获取分类图书数据
-    wx.request({
-      url: `${app.globalData.baseUrl}/book/category`,
-      method: 'GET',
-      data: {
-        category: category
-      },
-      success: function(res) {
-        console.log('获取分类图书数据成功', res.data);
-        if (res.data.success && res.data.data) {
-          // 后端返回的数据结构可能不同，这里需要根据实际情况调整
-          const gradeSemesterBooks = res.data.data || {
-            '大一': {
-              '上学期': [],
-              '下学期': []
-            },
-            '大二': {
-              '上学期': [],
-              '下学期': []
-            },
-            '大三': {
-              '上学期': [],
-              '下学期': []
-            }
-          };
-          
-          // 更新页面数据
-          that.setData({
-            grades: [
-              {
-                name: '大一',
-                semesters: [
-                  { name: '上学期', books: gradeSemesterBooks['大一']?.['上学期'] || [] },
-                  { name: '下学期', books: gradeSemesterBooks['大一']?.['下学期'] || [] }
-                ]
-              },
-              {
-                name: '大二',
-                semesters: [
-                  { name: '上学期', books: gradeSemesterBooks['大二']?.['上学期'] || [] },
-                  { name: '下学期', books: gradeSemesterBooks['大二']?.['下学期'] || [] }
-                ]
-              },
-              {
-                name: '大三',
-                semesters: [
-                  { name: '上学期', books: gradeSemesterBooks['大三']?.['上学期'] || [] },
-                  { name: '下学期', books: gradeSemesterBooks['大三']?.['下学期'] || [] }
-                ]
-              }
-            ]
-          });
-        } else {
-          // 后端返回数据不符合预期，使用空数据
-          that.setData({
-            grades: [
-              {
-                name: '大一',
-                semesters: [
-                  { name: '上学期', books: [] },
-                  { name: '下学期', books: [] }
-                ]
-              },
-              {
-                name: '大二',
-                semesters: [
-                  { name: '上学期', books: [] },
-                  { name: '下学期', books: [] }
-                ]
-              },
-              {
-                name: '大三',
-                semesters: [
-                  { name: '上学期', books: [] },
-                  { name: '下学期', books: [] }
-                ]
-              }
-            ]
-          });
-          wx.showToast({ title: '暂无课程数据', icon: 'none' });
-        }
-      },
-      fail: function(err) {
-        console.error('获取分类图书数据失败', err);
-        // 网络请求失败，使用空数据
-        that.setData({
-          grades: [
-            {
-              name: '大一',
-              semesters: [
-                { name: '上学期', books: [] },
-                { name: '下学期', books: [] }
-              ]
-            },
-            {
-              name: '大二',
-              semesters: [
-                { name: '上学期', books: [] },
-                { name: '下学期', books: [] }
-              ]
-            },
-            {
-              name: '大三',
-              semesters: [
-                { name: '上学期', books: [] },
-                { name: '下学期', books: [] }
-              ]
-            }
-          ]
-        });
-        wx.showToast({ title: '加载失败，请重试', icon: 'none' });
-      },
-      complete: function() {
-        // 隐藏加载状态
-        wx.hideLoading();
-        // 数据加载完成后更新当前选中的数据
-        that.updateCurrentData();
-      }
+    // 从本地存储获取图书数据
+    let allBooks = [];
+    const localBooks = wx.getStorageSync('localBooks') || [];
+    const publishedBooks = wx.getStorageSync('publishedBooks') || [];
+    allBooks = [...localBooks, ...publishedBooks];
+    
+    // 如果没有本地数据，使用模拟数据
+    if (allBooks.length === 0) {
+      allBooks = this.getMockBooks();
+    }
+    
+    // 根据分类筛选图书
+    const categoryBooks = allBooks.filter(book => book.category === category || book.college === category);
+    
+    // 将图书分配到各年级学期
+    const gradeSemesterBooks = {
+      '大一': { '上学期': [], '下学期': [] },
+      '大二': { '上学期': [], '下学期': [] },
+      '大三': { '上学期': [], '下学期': [] }
+    };
+    
+    // 简单分配：根据图书ID的哈希值分配到不同年级学期
+    categoryBooks.forEach((book, index) => {
+      const grades = ['大一', '大二', '大三'];
+      const semesters = ['上学期', '下学期'];
+      const gradeIndex = index % 3;
+      const semesterIndex = Math.floor(index / 3) % 2;
+      const grade = grades[gradeIndex];
+      const semester = semesters[semesterIndex];
+      gradeSemesterBooks[grade][semester].push(book);
     });
+    
+    // 更新页面数据
+    that.setData({
+      grades: [
+        {
+          name: '大一',
+          semesters: [
+            { name: '上学期', books: gradeSemesterBooks['大一']['上学期'] },
+            { name: '下学期', books: gradeSemesterBooks['大一']['下学期'] }
+          ]
+        },
+        {
+          name: '大二',
+          semesters: [
+            { name: '上学期', books: gradeSemesterBooks['大二']['上学期'] },
+            { name: '下学期', books: gradeSemesterBooks['大二']['下学期'] }
+          ]
+        },
+        {
+          name: '大三',
+          semesters: [
+            { name: '上学期', books: gradeSemesterBooks['大三']['上学期'] },
+            { name: '下学期', books: gradeSemesterBooks['大三']['下学期'] }
+          ]
+        }
+      ]
+    });
+    
+    // 隐藏加载状态
+    wx.hideLoading();
+    // 数据加载完成后更新当前选中的数据
+    that.updateCurrentData();
+    
+    // 如果没有数据，显示提示
+    if (categoryBooks.length === 0) {
+      wx.showToast({ title: '暂无课程数据', icon: 'none' });
+    }
+  },
+  
+  // 获取模拟图书数据
+  getMockBooks: function() {
+    return [
+      { id: 1, title: '高等数学（上）', author: '同济大学数学系', price: 45.00, category: '计算机学院', college: '计算机学院', image: 'https://picsum.photos/seed/book1/400/560' },
+      { id: 2, title: '高等数学（下）', author: '同济大学数学系', price: 45.00, category: '计算机学院', college: '计算机学院', image: 'https://picsum.photos/seed/book2/400/560' },
+      { id: 3, title: '线性代数', author: '同济大学数学系', price: 35.00, category: '计算机学院', college: '计算机学院', image: 'https://picsum.photos/seed/book3/400/560' },
+      { id: 4, title: '概率论与数理统计', author: '浙江大学数学系', price: 38.00, category: '计算机学院', college: '计算机学院', image: 'https://picsum.photos/seed/book4/400/560' },
+      { id: 5, title: 'C程序设计', author: '谭浩强', price: 42.00, category: '计算机学院', college: '计算机学院', image: 'https://picsum.photos/seed/book5/400/560' },
+      { id: 6, title: '数据结构', author: '严蔚敏', price: 48.00, category: '计算机学院', college: '计算机学院', image: 'https://picsum.photos/seed/book6/400/560' },
+      { id: 7, title: '计算机网络', author: '谢希仁', price: 52.00, category: '计算机学院', college: '计算机学院', image: 'https://picsum.photos/seed/book7/400/560' },
+      { id: 8, title: '操作系统', author: '汤小丹', price: 55.00, category: '计算机学院', college: '计算机学院', image: 'https://picsum.photos/seed/book8/400/560' },
+      { id: 9, title: '数据库系统概论', author: '王珊', price: 46.00, category: '计算机学院', college: '计算机学院', image: 'https://picsum.photos/seed/book9/400/560' },
+      { id: 10, title: 'Java程序设计', author: '耿祥义', price: 49.00, category: '计算机学院', college: '计算机学院', image: 'https://picsum.photos/seed/book10/400/560' }
+    ];
   },
 
   // 更新当前选中的年级和学期数据

@@ -1,12 +1,7 @@
 {
   "description": "校园二手图书交易平台",
   "packOptions": {
-    "ignore": [
-      {
-        "type": "directory",
-        "value": "backend"
-      }
-    ],
+    "ignore": [],
     "include": []
   },
   "setting": {
@@ -52,7 +47,6 @@
   "libVersion": "2.19.4",
   "appid": "wx9e6a59f13b7072d2",
   "projectname": "campus-bookstore",
-  "isGameTourist": false,
   "simulatorType": "wechat",
   "simulatorPluginLibVersion": {},
   "condition": {
@@ -69,5 +63,8 @@
       "list": []
     }
   },
-  "editorSetting": {}
+  "editorSetting": {
+    "tabIndent": "insertSpaces",
+    "tabSize": 2
+  }
 }

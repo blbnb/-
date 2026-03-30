@@ -3,10 +3,12 @@ Page({
   data: {
     activeTab: 'available', // available, used, expired
     coupons: [],
-    loading: true
+    loading: true,
+    selectMode: false
   },
 
-  onLoad: function() {
+  onLoad: function(options) {
+    this.setData({ selectMode: options.selectMode === 'true' });
     this.loadCoupons();
   },
 
@@ -136,13 +138,26 @@ Page({
     ];
   },
 
-  // 查看优惠券使用说明
+  // 查看优惠券使用说明或选择优惠券
   viewCouponDetail: function(e) {
     const couponId = e.currentTarget.dataset.id;
-    wx.showModal({
-      title: '优惠券说明',
-      content: '1. 每个订单仅可使用一张优惠券\n2. 优惠券不可兑换现金\n3. 最终解释权归图书馆商城所有',
-      showCancel: false
-    });
+    const coupon = this.data.coupons.find(c => c.id === couponId);
+    
+    if (this.data.selectMode) {
+      // 选择优惠券并返回
+      const pages = getCurrentPages();
+      const prevPage = pages[pages.length - 2];
+      if (prevPage && prevPage.onCouponSelected) {
+        prevPage.onCouponSelected(coupon);
+        wx.navigateBack();
+      }
+    } else {
+      // 显示优惠券说明
+      wx.showModal({
+        title: '优惠券说明',
+        content: '1. 每个订单仅可使用一张优惠券\n2. 优惠券不可兑换现金\n3. 最终解释权归图书馆商城所有',
+        showCancel: false
+      });
+    }
   }
 });

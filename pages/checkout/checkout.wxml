@@ -36,11 +36,24 @@
     </view>
   </view>
 
+  <!-- 优惠券选择 -->
+  <view class="coupon-section" bindtap="selectCoupon">
+    <view class="coupon-content">
+      <text class="coupon-label">优惠券</text>
+      <text class="coupon-value">{{selectedCoupon ? selectedCoupon.name : '未使用优惠券'}}</text>
+    </view>
+    <view class="coupon-arrow">›</view>
+  </view>
+
   <!-- 价格信息 -->
   <view class="price-section">
     <view class="price-item">
       <text class="price-label">商品总价</text>
       <text class="price-value">¥{{totalPrice}}</text>
+    </view>
+    <view class="price-item" wx:if="{{discountPrice > 0}}">
+      <text class="price-label">优惠券</text>
+      <text class="price-value discount">-¥{{discountPrice}}</text>
     </view>
     <view class="price-item">
       <text class="price-label">运费</text>
@@ -48,7 +61,7 @@
     </view>
     <view class="price-item total">
       <text class="total-label">实付款</text>
-      <text class="total-value">¥{{totalPrice}}</text>
+      <text class="total-value">¥{{finalPrice}}</text>
     </view>
   </view>
 
@@ -56,7 +69,7 @@
   <view class="bottom-bar">
     <view class="total-info">
       <text class="total-text">合计：</text>
-      <text class="total-amount">¥{{totalPrice}}</text>
+      <text class="total-amount">¥{{finalPrice}}</text>
       <view class="actions">
         <button class="cancel-btn" bindtap="cancelOrder" loading="{{loading}}">取消</button>
         <button class="submit-btn" bindtap="submitOrder" loading="{{loading}}">提交订单</button>

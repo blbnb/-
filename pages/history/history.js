@@ -23,7 +23,7 @@ Page({
     this.loadHistory();
   },
 
-  // 加载浏览历史
+  // 加载浏览历史（使用本地存储）
   loadHistory: function() {
     const userInfo = wx.getStorageSync('userInfo');
     if (!userInfo) {
@@ -33,38 +33,8 @@ Page({
 
     this.setData({ loading: true });
 
-    // 调用后端API获取浏览历史
-    wx.request({
-      url: app.globalData.baseUrl + '/history/list',
-      method: 'GET',
-      data: {
-        page: this.data.page,
-        pageSize: this.data.pageSize
-      },
-      header: {
-        'Authorization': 'Bearer ' + wx.getStorageSync('token')
-      },
-      success: (res) => {
-        if (res.data.success) {
-          const newHistory = res.data.data.list || [];
-          const updatedHistory = this.data.page === 1 ? newHistory : [...this.data.history, ...newHistory];
-          
-          this.setData({
-            history: updatedHistory,
-            hasMore: newHistory.length >= this.data.pageSize,
-            page: this.data.page + 1,
-            loading: false
-          });
-        } else {
-          // 使用本地存储的历史记录或模拟数据
-          this.loadLocalHistory();
-        }
-      },
-      fail: () => {
-        // 使用本地存储的历史记录或模拟数据
-        this.loadLocalHistory();
-      }
-    });
+    // 直接使用本地存储的历史记录或模拟数据
+    this.loadLocalHistory();
   },
 
   // 加载本地浏览历史
@@ -82,7 +52,7 @@ Page({
             title: '深度学习入门',
             author: '斋藤康毅',
             price: 45.00,
-            image: 'https://picsum.photos/seed/book201/200/280',
+            image: '/Default.jpg',
             publisher: '人民邮电出版社',
             publishDate: '2018-07-01',
             viewCount: 678
@@ -96,7 +66,7 @@ Page({
             title: '计算机网络：自顶向下方法',
             author: 'James F. Kurose',
             price: 62.00,
-            image: 'https://picsum.photos/seed/book202/200/280',
+            image: '/Default.jpg',
             publisher: '机械工业出版社',
             publishDate: '2018-03-01',
             viewCount: 345
@@ -110,7 +80,7 @@ Page({
             title: 'C++ Primer Plus',
             author: 'Stephen Prata',
             price: 78.50,
-            image: 'https://picsum.photos/seed/book203/200/280',
+            image: '/Default.jpg',
             publisher: '人民邮电出版社',
             publishDate: '2019-02-01',
             viewCount: 567
@@ -124,7 +94,7 @@ Page({
             title: 'Go程序设计语言',
             author: 'Alan A. A. Donovan',
             price: 55.00,
-            image: 'https://picsum.photos/seed/book204/200/280',
+            image: '/Default.jpg',
             publisher: '机械工业出版社',
             publishDate: '2016-01-01',
             viewCount: 234
@@ -138,7 +108,7 @@ Page({
             title: '机器学习实战',
             author: 'Peter Harrington',
             price: 59.00,
-            image: 'https://picsum.photos/seed/book205/200/280',
+            image: '/Default.jpg',
             publisher: '人民邮电出版社',
             publishDate: '2013-06-01',
             viewCount: 890
@@ -172,39 +142,16 @@ Page({
       content: '确定要清空所有浏览历史吗？',
       success: (res) => {
         if (res.confirm) {
-          // 调用后端API清空历史记录
-          wx.request({
-            url: app.globalData.baseUrl + '/history/clear',
-            method: 'POST',
-            header: {
-              'Authorization': 'Bearer ' + wx.getStorageSync('token')
-            },
-            success: (response) => {
-              // 无论成功与否，都清空本地数据
-              wx.removeStorageSync('browseHistory');
-              this.setData({
-                history: [],
-                hasMore: false
-              });
-              
-              wx.showToast({
-                title: '历史记录已清空',
-                icon: 'success'
-              });
-            },
-            fail: () => {
-              // 清空本地数据
-              wx.removeStorageSync('browseHistory');
-              this.setData({
-                history: [],
-                hasMore: false
-              });
-              
-              wx.showToast({
-                title: '历史记录已清空',
-                icon: 'success'
-              });
-            }
+          // 清空本地数据
+          wx.removeStorageSync('browseHistory');
+          this.setData({
+            history: [],
+            hasMore: false
+          });
+          
+          wx.showToast({
+            title: '历史记录已清空',
+            icon: 'success'
           });
         }
       }

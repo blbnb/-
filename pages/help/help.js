@@ -165,13 +165,43 @@ Page({
       sourceType: ['album', 'camera'],
       success: (res) => {
         const tempFilePaths = res.tempFilePaths;
-        const images = this.data.feedbackForm.images.concat(tempFilePaths);
         
-        this.setData({
-          'feedbackForm.images': images
+        // 将所有临时图片转换为 base64 格式
+        const base64Images = [];
+        let processedCount = 0;
+        
+        tempFilePaths.forEach((filePath, index) => {
+          wx.getFileSystemManager().readFile({
+            filePath: filePath,
+            encoding: 'base64',
+            success: (data) => {
+              const ext = filePath.split('.').pop().toLowerCase();
+              const mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';
+              const base64Image = 'data:' + mimeType + ';base64,' + data.data;
+              base64Images[index] = base64Image;
+              
+              processedCount++;
+              if (processedCount === tempFilePaths.length) {
+                // 所有图片都处理完成
+                const images = this.data.feedbackForm.images.concat(base64Images.filter(img => img));
+                this.setData({
+                  'feedbackForm.images': images
+                });
+              }
+            },
+            fail: (err) => {
+              console.error('图片转换失败:', err);
+              processedCount++;
+              if (processedCount === tempFilePaths.length) {
+                const images = this.data.feedbackForm.images.concat(base64Images.filter(img => img));
+                this.setData({
+                  'feedbackForm.images': images
+                });
+              }
+            }
+          });
         });
         
-        // 模拟上传图片到服务器
         console.log('选择的图片:', tempFilePaths);
       },
       fail: (err) => {
