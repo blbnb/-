@@ -285,6 +285,13 @@ Page({
   // 返回上一页
   goBack: function() {
     // 保留订单为待付款状态（不删除订单）
-    wx.navigateBack();
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+      wx.navigateBack();
+    } else {
+      wx.switchTab({
+        url: '/pages/index/index'
+      });
+    }
   }
 });

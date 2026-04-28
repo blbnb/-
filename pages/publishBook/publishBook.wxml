@@ -10,12 +10,18 @@
 
   <view class="content">
     <view class="form-group">
-      <view class="label">图书封面</view>
-      <view class="image-upload" bindtap="chooseImage">
-        <image wx:if="{{image}}" class="preview-image" src="{{image}}" mode="aspectFill"></image>
-        <view wx:else class="upload-placeholder">
+      <view class="label">图书图片</view>
+      <view class="image-upload-area">
+        <view class="image-list" wx:if="{{imageList.length > 0}}">
+          <view class="image-item" wx:for="{{imageList}}" wx:key="index">
+            <image class="image" src="{{item.url}}" mode="aspectFill" bindtap="previewImage" data-index="{{index}}"></image>
+            <view class="delete-btn" catchtap="deleteImage" data-index="{{index}}">×</view>
+            <view class="cover-tag" wx:if="{{index === 0}}">封面</view>
+          </view>
+        </view>
+        <view class="upload-btn" bindtap="chooseImage" wx:if="{{imageList.length < 9}}">
           <text class="upload-icon">+</text>
-          <text class="upload-text">点击上传封面</text>
+          <text class="upload-text">上传图片</text>
         </view>
       </view>
     </view>
@@ -43,7 +49,7 @@
       <view class="price-display">
         <text class="currency">¥</text>
         <text class="price-text">{{price || '0.00'}}</text>
-        <text wx:if="{{condition}}" class="discount-info">({{condition}}，{{Math.round(conditionDiscounts[condition] * 10)}}折)</text>
+        <text wx:if="{{condition}}" class="discount-info">({{condition}}，{{conditionDiscountText}})</text>
       </view>
     </view>
 

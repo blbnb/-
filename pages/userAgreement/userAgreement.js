@@ -90,32 +90,13 @@ Page({
     
     wx.showLoading({ title: '登录中...' });
     
-    // 模拟登录延迟
+    // 直接跳转到获取手机号页面，不传递复杂数据
     setTimeout(() => {
-      // 跳转到获取手机号页面
       wx.hideLoading();
       wx.navigateTo({
-        url: '/pages/getPhone/getPhone',
-        events: {
-          // 监听来自getPhone页面的事件
-          onPhoneReceived: (phoneData) => {
-            console.log('收到手机号信息:', phoneData);
-            this.completeLoginWithPhone(phoneData);
-          },
-          onPhoneCancel: () => {
-            console.log('用户取消绑定手机号');
-            this.completeLoginWithPhone(null);
-          }
-        },
-        success: (res) => {
-          // 向getPhone页面传递数据
-          res.eventChannel.emit('passLoginInfo', {
-            loginCode: this.data.loginCode,
-            userInfo: this.data.userInfo
-          });
-        }
+        url: '/pages/getPhone/getPhone'
       });
-    }, 1000);
+    }, 500);
   },
 
   // 完成登录（带手机号）
@@ -163,14 +144,15 @@ Page({
       wx.showToast({
         title: '登录成功',
         icon: 'success',
-        duration: 1500,
-        success: () => {
-          // 返回到用户页面
-          wx.switchTab({
-            url: '/pages/user/user'
-          });
-        }
+        duration: 1500
       });
+      
+      // 延迟跳转到用户页面
+      setTimeout(() => {
+        wx.switchTab({
+          url: '/pages/user/user'
+        });
+      }, 1500);
     }
   },
 
@@ -192,7 +174,14 @@ Page({
       success: (res) => {
         if (!res.confirm) {
           // 用户点击退出，返回上一页
-          wx.navigateBack();
+          const pages = getCurrentPages();
+          if (pages.length > 1) {
+            wx.navigateBack();
+          } else {
+            wx.switchTab({
+              url: '/pages/index/index'
+            });
+          }
         }
       }
     });

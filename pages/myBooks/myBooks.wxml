@@ -24,7 +24,7 @@
     <!-- 图书列表 -->
     <view class="book-list" wx:else>
       <view class="book-item" wx:for="{{books}}" wx:key="id" bindtap="goToBookDetail" data-id="{{item.id}}">
-        <image class="book-image" src="{{item.image || 'https://picsum.photos/seed/book/200/280'}}" mode="aspectFill"></image>
+        <image class="book-image" src="{{item.image || '/Default.jpg'}}" mode="aspectFill"></image>
         <view class="book-info">
           <view class="book-title">{{item.title}}</view>
           <view class="book-author">{{item.author}}</view>

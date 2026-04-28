@@ -24,7 +24,7 @@
     <!-- 历史记录列表 -->
     <view class="history-list" wx:else>
       <view class="history-item" wx:for="{{history}}" wx:key="id" bindtap="goToBookDetail" data-id="{{item.book.id}}">
-        <image class="book-image" src="{{item.book.image || 'https://picsum.photos/seed/book/200/280'}}" mode="aspectFill"></image>
+        <image class="book-image" src="{{item.book.image || '/Default.jpg'}}" mode="aspectFill"></image>
         <view class="book-info">
           <view class="book-title">{{item.book.title}}</view>
           <view class="book-author">{{item.book.author}}</view>

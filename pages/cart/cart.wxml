@@ -11,7 +11,7 @@
         <view class="checkbox" bindtap="toggleSelect" data-index="{{index}}">
           <view class="checkbox-inner" wx:if="{{item.selected}}">✓</view>
         </view>
-        <image src="{{item.image}}" mode="aspectFill"></image>
+        <image src="{{item.image || '/Default.jpg'}}" mode="aspectFill"></image>
         <view class="cart-info">
           <text class="book-title">{{item.title}}</text>
           <text class="book-price">¥{{item.price}}</text>

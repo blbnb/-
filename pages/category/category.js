@@ -184,9 +184,38 @@ Page({
 
   // 查看图书详情
   goToDetail: function(e) {
+    const app = getApp();
     const id = e.currentTarget.dataset.id;
+    
+    // 检查登录状态
+    if (!app.isLogin()) {
+      // 未登录，显示登录提示弹窗
+      this.showLoginDialog();
+      return;
+    }
+    
+    // 已登录，跳转到详情页
     wx.navigateTo({
       url: `/pages/detail/detail?id=${id}`
+    });
+  },
+
+  // 显示登录提示弹窗
+  showLoginDialog: function() {
+    wx.showModal({
+      title: '登录提示',
+      content: '请先登录后再查看书籍详情',
+      confirmText: '去登录',
+      cancelText: '取消',
+      confirmColor: '#07c160',
+      success: (res) => {
+        if (res.confirm) {
+          // 用户点击确认，跳转到登录页
+          wx.navigateTo({
+            url: '/pages/login/login'
+          });
+        }
+      }
     });
   }
 })

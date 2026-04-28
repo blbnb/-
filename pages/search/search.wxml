@@ -40,7 +40,7 @@
       <view class="book-list">
         <view class="book-item" wx:for="{{searchResults}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
           <view class="book-img-container">
-            <image src="{{item.image}}" mode="aspectFill"></image>
+            <image src="{{item.image || '/Default.jpg'}}" mode="aspectFill"></image>
             <text class="book-tag" wx:if="{{item.tags && item.tags.length > 0}}">{{item.tags[0]}}</text>
           </view>
           <view class="book-info">

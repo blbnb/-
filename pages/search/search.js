@@ -1,5 +1,6 @@
 // pages/search/search.js
 const app = getApp();
+const api = require('../../utils/api.js').api;
 
 Page({
   data: {
@@ -7,7 +8,7 @@ Page({
     searchResults: [],
     loading: false,
     noResults: false,
-    hotKeywords: ['JavaScript', '数据结构', '算法', 'Python', '经济学', '编译原理', '操作系统', '数据库']
+    hotKeywords: ['计算机', '教材', 'C 语言', '数据结构', '操作系统', '数据库', '数学', '英语']
   },
 
   onLoad: function(options) {
@@ -290,10 +291,10 @@ Page({
         const semesters = grades[grade];
         for (const semester in semesters) {
           const books = semesters[semester];
-          // 替换所有图片为默认图片
+          // 保留原有图片路径
           const booksWithDefaultImage = books.map(book => ({
             ...book,
-            image: '/Default.jpg'
+            image: book.image || ''
           }));
           allBooks = allBooks.concat(booksWithDefaultImage);
         }
@@ -303,61 +304,68 @@ Page({
     return allBooks;
   },
   
-  // 执行搜索（使用本地存储）
+  // 执行搜索（从后端 API 获取数据库数据）
   performSearch: function(keyword) {
+    const that = this;
     this.setData({ loading: true, noResults: false });
     
-    // 从本地存储获取所有图书
-    let allBooks = [];
-    const localBooks = wx.getStorageSync('localBooks') || [];
-    const publishedBooks = wx.getStorageSync('publishedBooks') || [];
-    allBooks = [...localBooks, ...publishedBooks];
-    
-    // 如果没有本地数据，使用模拟数据
-    if (allBooks.length === 0) {
-      allBooks = this.getAllCollegeBooks();
-    }
-    
-    // 模拟搜索延迟
-    setTimeout(() => {
-      // 过滤包含关键词的图书
-      const results = allBooks.filter(book => 
-        (book.title && book.title.includes(keyword)) || 
-        (book.author && book.author.includes(keyword)) ||
-        (book.tags && book.tags.some(tag => tag.includes(keyword))) ||
-        (book.college && book.college.includes(keyword)) ||
-        (book.category && book.category.includes(keyword))
-      );
-      
-      this.setData({
-        searchResults: results,
-        loading: false,
-        noResults: results.length === 0
-      });
-    }, 800);
-    
-    // 注释掉实际的网络请求，开发环境暂时不使用
-    /*
-    wx.request({
-      url: `${app.globalData.baseUrl}/book/search`,
-      method: 'GET',
-      data: { keyword: keyword },
-      success: (res) => {
-        if (res.data.success && res.data.data) {
-          this.setData({
-            searchResults: res.data.data,
-            loading: false,
-            noResults: res.data.data.length === 0
+    // 从后端 API 获取所有图书数据
+    api.book.getList({ page: 1, per_page: 200 })
+      .then((res) => {
+        console.log('搜索 API 返回:', res);
+        
+        let allBooks = [];
+        if (res && res.data) {
+          allBooks = res.data;
+        }
+        
+        // 过滤包含关键词的图书
+        const results = allBooks.filter(book => 
+          (book.title && book.title.includes(keyword)) || 
+          (book.author && book.author.includes(keyword)) ||
+          (book.category && book.category.includes(keyword)) ||
+          (book.description && book.description.includes(keyword)) ||
+          (book.isbn && book.isbn.includes(keyword))
+        );
+        
+        that.setData({
+          searchResults: results,
+          loading: false,
+          noResults: results.length === 0
+        });
+        
+        if (results.length === 0) {
+          wx.showToast({
+            title: '未找到相关图书',
+            icon: 'none'
           });
         }
-      },
-      fail: (err) => {
-        console.error('搜索失败', err);
-        this.setData({ loading: false });
-        wx.showToast({ title: '搜索失败', icon: 'none' });
-      }
-    });
-    */
+      })
+      .catch((err) => {
+        console.error('搜索失败:', err);
+        that.setData({ loading: false, noResults: true });
+        
+        // API 失败时，尝试从本地存储获取
+        let localBooks = wx.getStorageSync('localBooks') || [];
+        if (localBooks.length === 0) {
+          localBooks = that.getAllCollegeBooks();
+        }
+        
+        const results = localBooks.filter(book => 
+          (book.title && book.title.includes(keyword)) || 
+          (book.author && book.author.includes(keyword))
+        );
+        
+        that.setData({
+          searchResults: results,
+          noResults: results.length === 0
+        });
+        
+        wx.showToast({
+          title: '网络异常，显示本地数据',
+          icon: 'none'
+        });
+      });
   },
 
   // 保存搜索历史
@@ -402,14 +410,50 @@ Page({
 
   // 跳转到图书详情页
   goToDetail: function(e) {
+    const app = getApp();
     const id = e.currentTarget.dataset.id;
+    
+    // 检查登录状态
+    if (!app.isLogin()) {
+      // 未登录，显示登录提示弹窗
+      this.showLoginDialog();
+      return;
+    }
+    
+    // 已登录，跳转到详情页
     wx.navigateTo({
       url: `/pages/detail/detail?id=${id}`
     });
   },
 
+  // 显示登录提示弹窗
+  showLoginDialog: function() {
+    wx.showModal({
+      title: '登录提示',
+      content: '请先登录后再查看书籍详情',
+      confirmText: '去登录',
+      cancelText: '取消',
+      confirmColor: '#07c160',
+      success: (res) => {
+        if (res.confirm) {
+          // 用户点击确认，跳转到登录页
+          wx.navigateTo({
+            url: '/pages/login/login'
+          });
+        }
+      }
+    });
+  },
+
   // 返回上一页
   goBack: function() {
-    wx.navigateBack();
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+      wx.navigateBack();
+    } else {
+      wx.switchTab({
+        url: '/pages/index/index'
+      });
+    }
   }
 });

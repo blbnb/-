@@ -149,7 +149,13 @@ Page({
       const prevPage = pages[pages.length - 2];
       if (prevPage && prevPage.onCouponSelected) {
         prevPage.onCouponSelected(coupon);
-        wx.navigateBack();
+        if (pages.length > 1) {
+          wx.navigateBack();
+        } else {
+          wx.switchTab({
+            url: '/pages/index/index'
+          });
+        }
       }
     } else {
       // 显示优惠券说明

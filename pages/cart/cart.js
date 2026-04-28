@@ -26,7 +26,7 @@ Page({
   loadLocalCartData: function() {
     let cart = wx.getStorageSync('cart') || [];
     
-    // 清理旧格式的购物车数据并确保使用默认图片
+    // 清理旧格式的购物车数据
     cart = cart.map(item => {
       // 如果是旧格式（有 book 对象），转换为新格式
       if (item.book && !item.title) {
@@ -36,15 +36,14 @@ Page({
           title: item.book.title,
           author: item.book.author,
           price: item.book.price,
-          image: '/Default.jpg',
+          image: item.book.image || '',
           quantity: item.quantity,
           selected: item.selected || false
         };
       }
-      // 确保新格式数据有 selected 属性且使用默认图片
+      // 确保新格式数据有 selected 属性
       return {
         selected: false,
-        image: '/Default.jpg',
         ...item
       };
     });

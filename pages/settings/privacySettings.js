@@ -68,6 +68,13 @@ Page({
 
   // 返回上一页
   goBack: function() {
-    wx.navigateBack();
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+      wx.navigateBack();
+    } else {
+      wx.switchTab({
+        url: '/pages/index/index'
+      });
+    }
   }
 });

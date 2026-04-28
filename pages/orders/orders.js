@@ -173,10 +173,10 @@ Page({
         items: [
           {
             id: '1',
-            title: 'JavaScript高级程序设计',
+            title: 'JavaScript 高级程序设计',
             price: 109,
             quantity: 1,
-            image: '/Default.jpg'
+            image: ''
           }
         ],
         totalAmount: 109,
@@ -186,7 +186,7 @@ Page({
         address: {
           name: '张三',
           phone: '138****1234',
-          address: '北京市海淀区中关村大街1号'
+          address: '北京市海淀区中关村大街 1 号'
         }
       },
       {
@@ -195,10 +195,10 @@ Page({
         items: [
           {
             id: '2',
-            title: 'Python编程：从入门到实践',
+            title: 'Python 编程：从入门到实践',
             price: 79,
             quantity: 2,
-            image: 'https://picsum.photos/seed/book2/200/280'
+            image: ''
           }
         ],
         totalAmount: 158,
@@ -208,7 +208,7 @@ Page({
         address: {
           name: '张三',
           phone: '138****1234',
-          address: '北京市海淀区中关村大街1号'
+          address: '北京市海淀区中关村大街 1 号'
         }
       },
       {
@@ -220,7 +220,7 @@ Page({
             title: '算法导论',
             price: 128,
             quantity: 1,
-            image: 'https://picsum.photos/seed/book3/200/280'
+            image: ''
           }
         ],
         totalAmount: 128,
@@ -230,7 +230,7 @@ Page({
         address: {
           name: '张三',
           phone: '138****1234',
-          address: '北京市海淀区中关村大街1号'
+          address: '北京市海淀区中关村大街 1 号'
         }
       },
       {
@@ -242,14 +242,14 @@ Page({
             title: '设计模式',
             price: 89,
             quantity: 1,
-            image: 'https://picsum.photos/seed/book4/200/280'
+            image: ''
           },
           {
             id: '5',
             title: '计算机网络',
             price: 98,
             quantity: 1,
-            image: 'https://picsum.photos/seed/book5/200/280'
+            image: ''
           }
         ],
         totalAmount: 187,
@@ -259,7 +259,7 @@ Page({
         address: {
           name: '张三',
           phone: '138****1234',
-          address: '北京市海淀区中关村大街1号'
+          address: '北京市海淀区中关村大街 1 号'
         }
       }
     ];

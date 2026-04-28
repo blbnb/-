@@ -23,7 +23,7 @@
     <view class="section-title">商品清单</view>
     <view class="goods-list">
       <view class="goods-item" wx:for="{{checkoutItems}}" wx:key="id">
-        <image class="goods-image" src="{{item.image || 'https://picsum.photos/seed/book/200/280'}}"></image>
+        <image class="goods-image" src="{{item.image || '/Default.jpg'}}"></image>
         <view class="goods-info">
           <view class="goods-title">{{item.title}}</view>
           <view class="goods-author">{{item.author}}</view>

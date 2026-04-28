@@ -62,7 +62,7 @@ Page({
           title: '深入理解计算机系统',
           author: 'Randal E. Bryant',
           price: 58.00,
-          image: '/Default.jpg',
+          image: '',
           publisher: '机械工业出版社',
           publishDate: '2016-03-01',
           viewCount: 234
@@ -73,10 +73,10 @@ Page({
         id: 'fav2',
         book: {
           id: '102',
-          title: 'Python编程：从入门到实践',
+          title: 'Python 编程：从入门到实践',
           author: 'Eric Matthes',
           price: 42.50,
-          image: '/Default.jpg',
+          image: '',
           publisher: '人民邮电出版社',
           publishDate: '2016-07-01',
           viewCount: 456
@@ -90,7 +90,7 @@ Page({
           title: '数据结构与算法分析',
           author: 'Mark Allen Weiss',
           price: 48.00,
-          image: '/Default.jpg',
+          image: '',
           publisher: '电子工业出版社',
           publishDate: '2014-08-01',
           viewCount: 189
@@ -104,7 +104,7 @@ Page({
           title: '编译原理',
           author: 'Alfred V. Aho',
           price: 55.00,
-          image: '/Default.jpg',
+          image: '',
           publisher: '机械工业出版社',
           publishDate: '2011-08-01',
           viewCount: 156
@@ -125,9 +125,38 @@ Page({
 
   // 跳转到图书详情
   goToBookDetail: function(e) {
+    const app = getApp();
     const bookId = e.currentTarget.dataset.id;
+    
+    // 检查登录状态
+    if (!app.isLogin()) {
+      // 未登录，显示登录提示弹窗
+      this.showLoginDialog();
+      return;
+    }
+    
+    // 已登录，跳转到详情页
     wx.navigateTo({
       url: `/pages/detail/detail?id=${bookId}`
+    });
+  },
+
+  // 显示登录提示弹窗
+  showLoginDialog: function() {
+    wx.showModal({
+      title: '登录提示',
+      content: '请先登录后再查看书籍详情',
+      confirmText: '去登录',
+      cancelText: '取消',
+      confirmColor: '#07c160',
+      success: (res) => {
+        if (res.confirm) {
+          // 用户点击确认，跳转到登录页
+          wx.navigateTo({
+            url: '/pages/login/login'
+          });
+        }
+      }
     });
   },
 

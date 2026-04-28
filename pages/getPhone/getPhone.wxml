@@ -23,11 +23,10 @@
     <!-- 不允许按钮 -->
     <button 
         id="phoneButton"
-        open-type="getPhoneNumber" 
-        bindgetphonenumber="getPhoneNumber" 
         class="deny-button" 
         type="default"
         disabled="{{loading}}"
+        bindtap="handleCancel"
       >
         不允许
       </button>

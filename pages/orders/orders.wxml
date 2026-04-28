@@ -42,7 +42,7 @@
         <!-- 订单商品列表 -->
         <view class="order-items">
           <view wx:for="{{item.items}}" wx:for-item="product" wx:key="id" class="product-item">
-            <image class="product-image" src="{{product.image}}" mode="aspectFit"></image>
+            <image class="product-image" src="{{product.image || '/Default.jpg'}}" mode="aspectFit"></image>
             <view class="product-info">
               <text class="product-title">{{product.title}}</text>
               <view class="product-price-quantity">
@@ -89,7 +89,7 @@
     <!-- 空状态 -->
     <block wx:if="{{!loading && emptyState}}">
       <view class="empty-state">
-        <image src="/Default.jpg" mode="aspectFit"></image>
+        <image src="/assets/images/empty-notification.svg" mode="aspectFit"></image>
         <text class="empty-text">暂无订单</text>
         <button class="btn-primary" bindtap="goBack">去购物</button>
       </view>

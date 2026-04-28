@@ -91,7 +91,13 @@ Page({
       prevPage.updateSelectedAddress(address);
     }
     
-    wx.navigateBack();
+    if (pages.length > 1) {
+      wx.navigateBack();
+    } else {
+      wx.switchTab({
+        url: '/pages/index/index'
+      });
+    }
   },
 
   // 设置默认地址

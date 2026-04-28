@@ -1,60 +1,91 @@
-//app.js
+const api = require('./utils/api.js');
+
 App({
+  // 后端 API 配置
+  backendUrl: 'http://localhost:3000',
+  
   onLaunch: function () {
-    // 初始化小程序
     console.log('小程序启动');
     
-    // 清理存储并初始化
+    this.checkLoginStatus();
     this.cleanupAndInitStorage();
-    
-    // 清理旧的临时图片数据
     this.cleanTempImagePaths();
+  },
+  
+  // 全局数据 → 只保留这一次！
+  globalData: {
+    userInfo: null,
+    isLogin: false,
+    checkoutItems: [],
+    baseUrl: 'http://localhost:3000/api'
+  },
+  
+  // 检查登录状态
+  checkLoginStatus: function() {
+    const userInfo = wx.getStorageSync('userInfo');
+    if (userInfo && userInfo.id) {
+      this.globalData.userInfo = userInfo;
+      this.globalData.isLogin = true;
+      console.log('用户已登录:', userInfo.nickName);
+    } else {
+      this.globalData.userInfo = null;
+      this.globalData.isLogin = false;
+      console.log('用户未登录');
+    }
+  },
+  
+  // 判断是否已登录
+  isLogin: function() {
+    return this.globalData.isLogin;
+  },
+  
+  // 跳转到登录页
+  goToLogin: function() {
+    wx.navigateTo({
+      url: '/pages/login/login'
+    });
   },
   
   // 清理存储并初始化
   cleanupAndInitStorage: function() {
     console.log('开始清理和初始化存储...');
     try {
-      // 清理购物车，确保只使用默认图片
       let cart = wx.getStorageSync('cart') || [];
       if (cart.length > 0) {
-        cart = cart.map(item => ({
-          ...item,
-          image: '/Default.jpg'
-        }));
+        cart = cart.map(item => {
+          if (item.image && (item.image.includes('__tmp__') || item.image.includes('127.0.0.1'))) {
+            return { ...item, image: '' };
+          }
+          return item;
+        });
         wx.setStorageSync('cart', cart);
-        console.log('已清理购物车中的大图片');
       } else {
-        // 初始化空购物车
         wx.setStorageSync('cart', []);
       }
       
-      // 清理发布图书
       let publishedBooks = wx.getStorageSync('publishedBooks') || [];
       if (publishedBooks.length > 0) {
-        publishedBooks = publishedBooks.map(book => ({
-          ...book,
-          image: '/Default.jpg'
-        }));
+        publishedBooks = publishedBooks.map(book => {
+          if (book.image && (book.image.includes('__tmp__') || book.image.includes('127.0.0.1'))) {
+            return { ...book, image: '' };
+          }
+          return book;
+        });
         wx.setStorageSync('publishedBooks', publishedBooks);
-        console.log('已清理发布图书中的大图片');
       }
       
-      // 清理本地图书
       let localBooks = wx.getStorageSync('localBooks') || [];
       if (localBooks.length > 0) {
-        localBooks = localBooks.map(book => ({
-          ...book,
-          image: '/Default.jpg'
-        }));
+        localBooks = localBooks.map(book => {
+          if (book.image && (book.image.includes('__tmp__') || book.image.includes('127.0.0.1'))) {
+            return { ...book, image: '' };
+          }
+          return book;
+        });
         wx.setStorageSync('localBooks', localBooks);
-        console.log('已清理本地图书中的大图片');
       }
       
-      // 清理浏览历史
       wx.removeStorageSync('browseHistory');
-      console.log('已清理浏览历史');
-      
       console.log('存储清理和初始化完成');
     } catch (e) {
       console.error('清理存储失败:', e);
@@ -64,30 +95,20 @@ App({
   // 清理临时图片路径数据
   cleanTempImagePaths: function() {
     try {
-      // 清理发布的图书中的临时图片
       let publishedBooks = wx.getStorageSync('publishedBooks') || [];
       let needsUpdate = false;
       
       publishedBooks = publishedBooks.map(book => {
-        if (book.image && (book.image.includes('__tmp__') || book.image.includes('127.0.0.1') || book.image.includes('picsum.photos'))) {
+        if (book.image && (book.image.includes('__tmp__') || book.image.includes('127.0.0.1'))) {
           needsUpdate = true;
-          return {
-            ...book,
-            image: '/Default.jpg'
-          };
+          return { ...book, image: '' };
         }
         return book;
       });
+      if (needsUpdate) wx.setStorageSync('publishedBooks', publishedBooks);
       
-      if (needsUpdate) {
-        wx.setStorageSync('publishedBooks', publishedBooks);
-        console.log('已清理发布图书中的临时图片');
-      }
-      
-      // 清理反馈中的临时图片
       let feedbacks = wx.getStorageSync('feedbacks') || [];
       needsUpdate = false;
-      
       feedbacks = feedbacks.map(feedback => {
         if (feedback.images && feedback.images.length > 0) {
           const cleanedImages = feedback.images.filter(img => 
@@ -95,124 +116,70 @@ App({
           );
           if (cleanedImages.length !== feedback.images.length) {
             needsUpdate = true;
-            return {
-              ...feedback,
-              images: cleanedImages
-            };
+            return { ...feedback, images: cleanedImages };
           }
         }
         return feedback;
       });
+      if (needsUpdate) wx.setStorageSync('feedbacks', feedbacks);
       
-      if (needsUpdate) {
-        wx.setStorageSync('feedbacks', feedbacks);
-        console.log('已清理反馈中的临时图片');
-      }
-      
-      // 清理购物车中的临时图片
       let cart = wx.getStorageSync('cart') || [];
       needsUpdate = false;
-      
       cart = cart.map(item => {
-        if (item.image && (item.image.includes('__tmp__') || item.image.includes('127.0.0.1') || item.image.includes('picsum.photos'))) {
+        if (item.image && (item.image.includes('__tmp__') || item.image.includes('127.0.0.1'))) {
           needsUpdate = true;
-          return {
-            ...item,
-            image: '/Default.jpg'
-          };
+          return { ...item, image: '' };
         }
         return item;
       });
+      if (needsUpdate) wx.setStorageSync('cart', cart);
       
-      if (needsUpdate) {
-        wx.setStorageSync('cart', cart);
-        console.log('已清理购物车中的临时图片');
-      }
-      
-      // 清理本地图书中的临时图片
       let localBooks = wx.getStorageSync('localBooks') || [];
       needsUpdate = false;
-      
       localBooks = localBooks.map(book => {
-        if (book.image && (book.image.includes('__tmp__') || book.image.includes('127.0.0.1') || book.image.includes('picsum.photos'))) {
+        if (book.image && (book.image.includes('__tmp__') || book.image.includes('127.0.0.1'))) {
           needsUpdate = true;
-          return {
-            ...book,
-            image: '/Default.jpg'
-          };
+          return { ...book, image: '' };
         }
         return book;
       });
+      if (needsUpdate) wx.setStorageSync('localBooks', localBooks);
       
-      if (needsUpdate) {
-        wx.setStorageSync('localBooks', localBooks);
-        console.log('已清理本地图书中的临时图片');
-      }
-      
-      // 清理浏览历史中的临时图片
       let browseHistory = wx.getStorageSync('browseHistory') || [];
       needsUpdate = false;
-      
       browseHistory = browseHistory.map(item => {
-        if (item.book && item.book.image && (item.book.image.includes('__tmp__') || item.book.image.includes('127.0.0.1') || item.book.image.includes('picsum.photos'))) {
+        if (item.book && item.book.image && (item.book.image.includes('__tmp__') || item.book.image.includes('127.0.0.1'))) {
           needsUpdate = true;
           return {
             ...item,
-            book: {
-              ...item.book,
-              image: '/Default.jpg'
-            }
+            book: { ...item.book, image: '' }
           };
         }
         return item;
       });
+      if (needsUpdate) wx.setStorageSync('browseHistory', browseHistory);
       
-      if (needsUpdate) {
-        wx.setStorageSync('browseHistory', browseHistory);
-        console.log('已清理浏览历史中的临时图片');
-      }
-      
-      // 清理收藏中的临时图片
       let favorites = wx.getStorageSync('favorites') || [];
       needsUpdate = false;
-      
       favorites = favorites.map(item => {
-        if (item.book && item.book.image && (item.book.image.includes('__tmp__') || item.book.image.includes('127.0.0.1') || item.book.image.includes('picsum.photos'))) {
+        if (item.book && item.book.image && (item.book.image.includes('__tmp__') || item.book.image.includes('127.0.0.1'))) {
           needsUpdate = true;
           return {
             ...item,
-            book: {
-              ...item.book,
-              image: '/Default.jpg'
-            }
+            book: { ...item.book, image: '' }
           };
         }
         return item;
       });
+      if (needsUpdate) wx.setStorageSync('favorites', favorites);
       
-      if (needsUpdate) {
-        wx.setStorageSync('favorites', favorites);
-        console.log('已清理收藏中的临时图片');
-      }
-      
-      // 清理用户头像中的临时图片（确保用户头像不被替换）
       let userInfo = wx.getStorageSync('userInfo');
       if (userInfo && userInfo.avatarUrl && (userInfo.avatarUrl.includes('__tmp__') || userInfo.avatarUrl.includes('127.0.0.1'))) {
-        userInfo = {
-          ...userInfo,
-          avatarUrl: '/Default.jpg'
-        };
+        userInfo = { ...userInfo, avatarUrl: '' };
         wx.setStorageSync('userInfo', userInfo);
-        console.log('已清理用户头像中的临时图片');
       }
     } catch (e) {
       console.error('清理临时图片失败:', e);
     }
-  },
-  
-  globalData: {
-    userInfo: null,
-    isLogin: false,
-    checkoutItems: [] // 结算商品列表
   }
 })

@@ -172,7 +172,7 @@ Page({
         author: item.author,
         price: item.price,
         quantity: item.quantity,
-        image: item.image || '/Default.jpg'
+        image: item.image || ''
       })),
       totalAmount: this.data.finalPrice,
       totalPrice: this.data.finalPrice,
@@ -258,7 +258,15 @@ Page({
       content: "确定要取消订单吗？",
       success: (res) => {
         if (res.confirm) {
-          wx.navigateBack();
+          // 返回上一页
+          const pages = getCurrentPages();
+          if (pages.length > 1) {
+            wx.navigateBack();
+          } else {
+            wx.switchTab({
+              url: '/pages/index/index'
+            });
+          }
         }
       },
     });

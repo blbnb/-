@@ -35,6 +35,12 @@ Page({
     }
   },
 
+  // 处理图片加载错误
+  handleImageError: function(e) {
+    console.log('图片加载失败，使用默认图片');
+    // 图片加载失败时，已经在 WXML 中设置了 fallback 到 Default.jpg
+  },
+
   // 检查登录状态
   checkLoginStatus: function() {
     try {
@@ -46,7 +52,7 @@ Page({
         const completeUserInfo = {
           id: userInfo.id || Date.now().toString(),
           nickName: userInfo.nickName || userInfo.nickname || '微信用户',
-          avatarUrl: userInfo.avatarUrl || '/Default.jpg',
+          avatarUrl: userInfo.avatarUrl || '',
           ...userInfo
         };
         
@@ -175,43 +181,12 @@ Page({
     wx.setStorageSync('notificationCount', 0);
   },
 
-  // 登录 - 使用微信登录
+  // 登录 - 跳转到登录页面
   login: function() {
-    console.log('登录函数被调用');
-    // 直接开始登录，跳过用户协议（用于测试）
-    this.startLoginProcess();
-  },
-
-  // 显示用户协议弹窗
-  showUserAgreement: function() {
-    console.log('显示用户协议弹窗');
-    wx.showModal({
-      title: '用户协议',
-      content: '欢迎使用校园图书小程序！\n\n在您登录前，请仔细阅读以下协议：\n\n1. 您必须遵守国家法律法规\n2. 不得发布违法违规内容\n3. 尊重他人知识产权\n4. 保护个人隐私信息\n5. 合理使用平台功能\n\n请您务必阅读并理解本协议的全部内容。',
-      showCancel: true,
-      cancelText: '暂不登录',
-      confirmText: '我已阅读并同意',
-      success: (res) => {
-        console.log('用户协议弹窗结果:', res);
-        if (res.confirm) {
-          // 开始登录流程
-          this.startLoginProcess();
-        }
-      }
+    console.log('跳转到登录页面');
+    wx.navigateTo({
+      url: '/pages/login/login'
     });
-  },
-
-  // 开始登录流程
-  startLoginProcess: function() {
-    console.log('开始登录流程');
-    wx.showLoading({ title: '登录中...' });
-    
-    // 直接使用本地登录，跳过已废弃的微信API
-    const defaultUserInfo = {
-      nickName: '微信用户',
-      avatarUrl: '/Default.jpg'
-    };
-    this.handleLocalLogin(defaultUserInfo, null);
   },
   
   // 完成登录流程
@@ -239,7 +214,7 @@ Page({
       const localUserInfo = {
         id: Date.now().toString(),
         nickName: userInfo.nickName || '微信用户',
-        avatarUrl: userInfo.avatarUrl || '/Default.jpg',
+        avatarUrl: userInfo.avatarUrl || '',
         phone: phoneData ? '已获取' : '未绑定',
         college: '未设置',
         level: '普通会员',

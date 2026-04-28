@@ -141,13 +141,20 @@ Page({
     wx.showToast({
       title: this.data.isEdit ? '更新成功' : '添加成功',
       icon: 'success',
-      duration: 1500,
-      success: () => {
-        setTimeout(() => {
-          wx.navigateBack();
-        }, 1500);
-      }
+      duration: 1500
     });
+    
+    setTimeout(() => {
+      // 尝试返回上一页，如果失败则跳转到首页
+      const pages = getCurrentPages();
+      if (pages.length > 1) {
+        wx.navigateBack();
+      } else {
+        wx.switchTab({
+          url: '/pages/index/index'
+        });
+      }
+    }, 1500);
   },
 
   // 表单验证

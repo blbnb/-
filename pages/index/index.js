@@ -1,5 +1,6 @@
 // pages/index/index.js
 const app = getApp();
+const api = require('../../utils/api.js').api;
 
 Page({
   data: {
@@ -54,37 +55,71 @@ Page({
     this.fetchBooks();
   },
 
-  // 获取图书数据（使用本地数据）
+  // 获取图书数据 (从后端 API)
   fetchBooks: function () {
     const that = this;
 
     // 显示加载状态
     wx.showLoading({ title: "加载中..." });
 
-    // 从本地存储获取图书数据
-    let books = [];
-    
-    // 1. 尝试从本地存储获取
-    const localBooks = wx.getStorageSync('localBooks') || [];
-    const publishedBooks = wx.getStorageSync('publishedBooks') || [];
-    
-    // 合并本地图书和发布的图书
-    books = [...localBooks, ...publishedBooks];
-    
-    // 2. 如果没有本地数据，使用模拟数据
-    if (books.length === 0) {
-      books = this.getMockBooks();
-      // 保存到本地存储
-      wx.setStorageSync('localBooks', books);
-    }
-    
-    // 更新页面数据
-    that.setData({
-      recommendBooks: books.slice(0, 10), // 只显示前10本
-    });
-    
-    // 隐藏加载状态
-    wx.hideLoading();
+    // 从后端 API 获取图书数据
+    api.book.getList({ page: 1, per_page: 50 })
+      .then((res) => {
+        console.log('获取图书成功:', res);
+        
+        let books = [];
+        if (res && res.data) {
+          // 转换数据格式
+          books = res.data.map(book => ({
+            id: book.id,
+            title: book.title,
+            author: book.author,
+            price: book.price,
+            originalPrice: book.price * 1.5, // 模拟原价
+            image: book.cover_image || '/Default.jpg',
+            description: book.description || '',
+            category: book.category,
+            stock: book.stock,
+            viewCount: 0,
+            favoriteCount: 0
+          }));
+        }
+        
+        // 如果没有数据，使用模拟数据
+        if (books.length === 0) {
+          books = that.getMockBooks();
+        }
+        
+        // 更新页面数据
+        that.setData({
+          recommendBooks: books.slice(0, 10), // 只显示前 10 本
+        });
+        
+        // 保存到本地存储 (可选)
+        wx.setStorageSync('localBooks', books);
+        
+        // 隐藏加载状态
+        wx.hideLoading();
+      })
+      .catch((err) => {
+        console.error('获取图书失败:', err);
+        wx.hideLoading();
+        
+        // API 失败时使用本地数据
+        let books = wx.getStorageSync('localBooks') || [];
+        if (books.length === 0) {
+          books = that.getMockBooks();
+        }
+        
+        that.setData({
+          recommendBooks: books.slice(0, 10),
+        });
+        
+        wx.showToast({
+          title: '加载本地数据',
+          icon: 'none'
+        });
+      });
   },
 
   // 获取模拟图书数据
@@ -92,12 +127,12 @@ Page({
     return [
       {
         id: 1,
-        title: "JavaScript高级程序设计",
+        title: "JavaScript 高级程序设计",
         author: "Matt Frisbie",
         price: 59.0,
         originalPrice: 89.0,
-        image: "/Default.jpg",
-        description: '本书是JavaScript领域最有影响力和口碑的著作之一',
+        image: "",
+        description: '本书是 JavaScript 领域最有影响力和口碑的著作之一',
         publisher: "人民邮电出版社",
         viewCount: 3456,
         favoriteCount: 892,
@@ -108,7 +143,7 @@ Page({
         author: "严蔚敏",
         price: 45.0,
         originalPrice: 68.0,
-        image: "/Default.jpg",
+        image: "",
         description: "本书是数据结构领域的经典教材",
         publisher: "清华大学出版社",
         viewCount: 2890,
@@ -116,23 +151,23 @@ Page({
       },
       {
         id: 101,
-        title: "C语言程序设计",
+        title: "C 语言程序设计",
         author: "谭浩强",
         price: 35.0,
         originalPrice: 45.0,
-        image: "/Default.jpg",
-        description: "本书是C语言领域的经典教材",
+        image: "",
+        description: "本书是 C 语言领域的经典教材",
         publisher: "清华大学出版社",
         viewCount: 5680,
         favoriteCount: 1280,
       },
       {
         id: 102,
-        title: "高等数学A(上)",
+        title: "高等数学 A(上)",
         author: "同济大学数学系",
         price: 42.0,
         originalPrice: 50.0,
-        image: "/Default.jpg",
+        image: "",
         description: "本书是高等数学课程的经典教材",
         publisher: "高等教育出版社",
         viewCount: 8920,
@@ -144,7 +179,7 @@ Page({
         author: "严蔚敏",
         price: 48.0,
         originalPrice: 60.0,
-        image: "/Default.jpg",
+        image: "",
         description: "本书系统地介绍了各种数据结构",
         publisher: "清华大学出版社",
         viewCount: 4560,
@@ -156,7 +191,7 @@ Page({
         author: "谢希仁",
         price: 48.0,
         originalPrice: 65.0,
-        image: "/Default.jpg",
+        image: "",
         description: "本书系统地介绍了计算机网络",
         publisher: "电子工业出版社",
         viewCount: 4450,
@@ -196,10 +231,40 @@ Page({
     }
   },
 
+// 跳转到书籍详情页
   goToDetail: function (e) {
+    const app = getApp();
     const id = e.currentTarget.dataset.id;
+    
+    // 检查登录状态
+    if (!app.isLogin()) {
+      // 未登录，显示登录提示弹窗
+      this.showLoginDialog();
+      return;
+    }
+    
+    // 已登录，跳转到详情页
     wx.navigateTo({
       url: `/pages/detail/detail?id=${id}`,
+    });
+  },
+
+  // 显示登录提示弹窗
+  showLoginDialog: function() {
+    wx.showModal({
+      title: '登录提示',
+      content: '请先登录后再查看书籍详情',
+      confirmText: '去登录',
+      cancelText: '取消',
+      confirmColor: '#07c160',
+      success: (res) => {
+        if (res.confirm) {
+          // 用户点击确认，跳转到登录页
+          wx.navigateTo({
+            url: '/pages/login/login'
+          });
+        }
+      }
     });
   },
 

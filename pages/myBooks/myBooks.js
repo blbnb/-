@@ -47,7 +47,7 @@ Page({
       title: book.title,
       author: book.author,
       price: book.price,
-      image: book.image || '/Default.jpg',
+      image: book.image || '',
       status: 'available',
       publishDate: book.publishTime || '2024-01-01',
       viewCount: 100 + index
@@ -70,10 +70,10 @@ Page({
     const mockBooks = [
       {
         id: '1',
-        title: 'JavaScript高级程序设计',
+        title: 'JavaScript 高级程序设计',
         author: 'Nicholas C. Zakas',
         price: 68.00,
-        image: '/Default.jpg',
+        image: '',
         status: 'available',
         publishDate: '2020-01-15',
         viewCount: 156
@@ -83,7 +83,7 @@ Page({
         title: '算法导论',
         author: 'Thomas H. Cormen',
         price: 45.00,
-        image: '/Default.jpg',
+        image: '',
         status: 'sold',
         publishDate: '2020-03-20',
         viewCount: 98
@@ -93,7 +93,7 @@ Page({
         title: '设计模式',
         author: 'Erich Gamma',
         price: 38.50,
-        image: '/Default.jpg',
+        image: '',
         status: 'available',
         publishDate: '2020-02-10',
         viewCount: 124
@@ -109,9 +109,38 @@ Page({
 
   // 跳转到图书详情
   goToBookDetail: function(e) {
+    const app = getApp();
     const bookId = e.currentTarget.dataset.id;
+    
+    // 检查登录状态
+    if (!app.isLogin()) {
+      // 未登录，显示登录提示弹窗
+      this.showLoginDialog();
+      return;
+    }
+    
+    // 已登录，跳转到详情页
     wx.navigateTo({
       url: `/pages/detail/detail?id=${bookId}`
+    });
+  },
+
+  // 显示登录提示弹窗
+  showLoginDialog: function() {
+    wx.showModal({
+      title: '登录提示',
+      content: '请先登录后再查看书籍详情',
+      confirmText: '去登录',
+      cancelText: '取消',
+      confirmColor: '#07c160',
+      success: (res) => {
+        if (res.confirm) {
+          // 用户点击确认，跳转到登录页
+          wx.navigateTo({
+            url: '/pages/login/login'
+          });
+        }
+      }
     });
   },
 

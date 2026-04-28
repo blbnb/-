@@ -3,6 +3,7 @@
     "pages/index/index",
     "pages/cart/cart",
     "pages/user/user",
+    "pages/login/login",
     "pages/category/category",
     "pages/detail/detail",
     "pages/getPhone/getPhone",
@@ -20,7 +21,8 @@
     "pages/notifications/notifications",
     "pages/help/help",
     "pages/search/search",
-    "pages/publishBook/publishBook"
+    "pages/publishBook/publishBook",
+    "pages/test/test"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -28,15 +30,10 @@
     "navigationBarTitleText": "校园书屋",
     "navigationBarTextStyle": "white"
   },
-  "globalStyle": {
-    "navigationBarTextStyle": "white",
-    "navigationBarBackgroundColor": "#4F46E5"
-  },
   "tabBar": {
     "color": "#999999",
     "selectedColor": "#4F46E5",
     "backgroundColor": "#ffffff",
-    "iconSize": 24,
     "list": [
       {
         "pagePath": "pages/index/index",
